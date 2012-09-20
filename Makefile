@@ -16,17 +16,17 @@ OBJS 		= boot/boot.o
 .PHONY : all clean
 
 # 默认执行所有
-all: ${PLAYOS_BOOTS} ${OBJS}
+all: ${OBJS} ${PLAYOS_BOOTS} 
 
 clean :
 	@rm -rf ${OBJS} ${PLAYOS_BOOTS} ## 加上@符号就不会打印执行都命令本身
 
 ## boot程序
 boot/boot.o : boot/boot.s
-	${ASM} ${ASMFLAGS} $@ $<  ## $<代表依赖都目标，这里为:boot/boot.o,$@代表目标，这里为:boot.bin
+	@${ASM} ${ASMFLAGS} $@ $<  ## $<代表依赖都目标，这里为:boot/boot.o,$@代表目标，这里为:boot.bin
 
 boot/boot.bin:
-	${LDFLAGS} $@ boot/boot.o
+	@${ASM_LD} ${LDFLAGS} $@ boot/boot.o
 	
 
 

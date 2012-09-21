@@ -14,6 +14,15 @@
 !
 ! 出口参数：CF＝0——操作成功，AH＝00H，AL＝传输的扇区数，否则，AH＝状态代码，参见功能号01H中的说明
 
+
+.global begtext, begdata, begbss, endtext, enddata, endbss
+.text
+begtext:
+.data
+begdata:
+.bss
+begbss:
+.text
 BOOTSEG = 0X07c0 ! BIOS加载boot代码到指定的内存地址（原始段地址）（31k） 0x7c0是boot所在的段值，或者说单位是“节”（16字节）。换算成基地址值需要乘16，即0x7c00
 ! 总共有20根地址线也就是20位寻址.
 ! 0x07c0 是表示高16位地址位.
@@ -81,4 +90,9 @@ gdt_48:.word	0x7ff
 	.word	0x7c00+gdt,0
 .org	510
 	.word	0xAA55
-
+.text
+endtext:
+.data
+enddata:
+.bss
+endbss:

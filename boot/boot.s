@@ -14,7 +14,7 @@
 !
 ! 出口参数：CF＝0——操作成功，AH＝00H，AL＝传输的扇区数，否则，AH＝状态代码，参见功能号01H中的说明
 
-BOOTSEG = 0X7C00 ! BIOS加载boot代码到指定的内存地址（原始段地址）（31k）
+BOOTSEG = 0X07c0 ! BIOS加载boot代码到指定的内存地址（原始段地址）
 SYSSEG	= 0X1000 ! 先把内核（head.bin）复制到内存地址0x1000处
 SYSLEN	= 17 ! 内核占用都最大磁盘扇区数
 entry start !告知链接程序，程序从start处开始执行

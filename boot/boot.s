@@ -14,12 +14,16 @@
 !
 ! 出口参数：CF＝0——操作成功，AH＝00H，AL＝传输的扇区数，否则，AH＝状态代码，参见功能号01H中的说明
 
-BOOTSEG = 0X07c0 ! BIOS加载boot代码到指定的内存地址（原始段地址）
+BOOTSEG = 0X07c0 ! BIOS加载boot代码到指定的内存地址（原始段地址）（31k） 0x7c0是boot所在的段值，或者说单位是“节”（16字节）。换算成基地址值需要乘16，即0x7c00
+! 总共有20根地址线也就是20位寻址.
+! 0x07c0 是表示高16位地址位.
+! 基地址是等于0x07c0加上四位二进制的位也就是一个十六进制的值=0x07c00
+
 SYSSEG	= 0X1000 ! 先把内核（head.bin）复制到内存地址0x1000处
 SYSLEN	= 17 ! 内核占用都最大磁盘扇区数
 entry start !告知链接程序，程序从start处开始执行
 start:
-	jmpi go,BOOTSEG ! 段间跳转，go是偏移地址
+	jmpi go,#BOOTSEG ! 段间跳转，go是偏移地址
 go:	mov ax,cs
 	mov ds,ax
 	mov ss,ax
@@ -39,11 +43,11 @@ die:	jmp die ! 死循环
 ok_load:
 	cli	! 关闭中断
 	! 移动开始位置 ds:si=0x1000:0,目标地址 es:di 0x0000:0
-	mov ax,SYSSEG
+	mov ax,#SYSSEG
 	mov ds,ax
 	xor ax,ax
 	mov es,ax
-	mov cx,0x1000 ! 移动4K次，每次移动一个字（内核长度不超过8K）
+	mov cx,#0x2000 ! 移动4K次，每次移动一个字（内核长度不超过8K）
 	sub si,si
 	sub di,di
 	! rep的转换：每次执行的时候先执行cx=cx-1然后判断cx是否为0，如果是0说明REP MOVW这个指令执行完毕了，直接跳转执行REP MOVSW的下一行语句，
@@ -61,24 +65,20 @@ ok_load:
 	
 gdt:	.word	0,0,0,0 ! 段描述符0，不用（每个描述符占8个字节，描述符都说明可以查看intel开发手册或是于渊例子《自己动手编写操作系统》中都pm.inc文件）
 
-	.word	0x7ff	! 段描述符1，界限8M(2048*4K)
+	.word	0x07FF	! 段描述符1，界限8M(2048*4K)
 	.word	0x0000	
 	.word	0x9A00  ! 是代码段，可读/执行
-	.word	0x00c0	! 颗粒度为4K
+	.word	0x00C0	! 颗粒度为4K
 
-	.word	0x7ff 	! 段描述符2，界限8M(2048*4K)
+	.word	0x07FF	! 段描述符2，界限8M(2048*4K)
 	.word	0x0000
 	.word	0x9200 ! 是数据段，可读/写
-	.word	0x00c0
+	.word	0x00C0
 
-idt_48:	
-	.word	0
+idt_48:	.word	0
 	.word	0,0
-gdt_48:
-	.word	0x7ff
+gdt_48:.word	0x7ff
 	.word	0x7c00+gdt,0
 .org	510
 	.word	0xAA55
-
-
 

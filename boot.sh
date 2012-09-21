@@ -1,2 +1,2 @@
 #!/bin/sh
-bochs -f bochsrc
+bochsdbg -q -f bochsrc

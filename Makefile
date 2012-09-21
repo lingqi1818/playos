@@ -10,7 +10,7 @@ AS		= as
 LD		= ld
 LD_FLAGS	=-s -x -M
 ASMFLAGS	= -0 -a -o
-LD86_FLAGS		= -0 -s -o
+LD86_FLAGS	= -0 -s -o
 
 PLAYOS_BOOTS	= boot/boot.bin boot/head.bin
 OBJS 		= boot/boot.o boot/head.o

@@ -37,7 +37,7 @@ boot/boot.bin:
 boot/head.o : boot/head.s
 
 boot/head.bin:boot/head.o
-	@${LD} ${LD_FLAGS} -m elf_i386 -Ttext 0 -e startup_32  $< -o $@ > System.map
+	@${LD} ${LD_FLAGS} -m elf_i386 -Ttext 0 -e startup_32  -o $@ $< > System.map
 	
 
 

@@ -86,8 +86,8 @@ gdt:	.word	0,0,0,0 ! 段描述符0，不用（每个描述符占8个字节，描
 
 idt_48:	.word	0
 	.word	0,0
-gdt_48:.word	0x7ff
-	.word	0x7c00+gdt,0
+gdt_48:.word	0x7ff ! GDB长度2048字节，最多可以有256个描述符
+	.word	0x7c00+gdt,0 ! gdt表基地址从0x7c00+gdt处开始
 .org	510
 	.word	0xAA55
 .text

@@ -36,7 +36,7 @@ start:
 go:	mov ax,cs
 	mov ds,ax
 	mov ss,ax
-	mov sp,#0x400 ! 设置临时栈指针。只要值大于0x200（512）即可。
+	mov sp,#0x400 ! 设置临时栈指针。只要值大于0x200（512）即可。本程序中，此处都栈没有用处。
 	
 ! 加载内核代码到内存0x1000处
 load_system:

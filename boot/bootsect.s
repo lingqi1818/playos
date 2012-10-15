@@ -55,7 +55,7 @@ go:	mov	ax,cs
 load_setup:
 	mov	dx,#0x0000 ! DH磁头号，DL驱动器号。
 	mov	cx,#0x0002	!CH磁道号（共10位）高八位，CL6，7未为磁道号低两位。CL0-5为起始扇区号。（从1开始，setup在bootsec扇区之后，所以为2）
-	mov	bx,#0x200	! EX：BX 读入缓冲区位置为,0X9000:0x0200即0x90200处
+	mov	bx,#0x200	! ES：BX 读入缓冲区位置为,0X9000:0x0200即0x90200处
 	mov	ax,#0X200+SETUPLEN ! 入口参数：AH＝02H AL＝扇区数
 	int	0x13
 	jnc	ok_load_setup ! jnc是一条跳转指令，当进位标记C为0时跳转，为1时执行后面的指令。
@@ -101,6 +101,8 @@ ok_load_setup:
 	mov	bp,#msg1
 	mov	ax,#0x1301	! 显示字符，光标跟随移动
 	int	0x10
+
+	jmpi	0,SETUPSEG
 
 	mov	ax,#SYSSEG
 	mov	es,ax	! es=存放system的段地址

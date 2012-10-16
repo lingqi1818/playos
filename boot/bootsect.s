@@ -102,8 +102,6 @@ ok_load_setup:
 	mov	ax,#0x1301	! 显示字符，光标跟随移动
 	int	0x10
 
-	jmpi	0,SETUPSEG
-
 	mov	ax,#SYSSEG
 	mov	es,ax	! es=存放system的段地址
 	call	read_it	! 读磁盘上都system模块
@@ -179,7 +177,7 @@ ok3_read:
 	shl	cx,#9
 	add	bx,cx	! 调整当前段内数据开始位置
 	jnc	rp_read	! 若没有超过段界限，则继续读取到本段内
-	mov	es,ax
+	mov	ax,es
 	add	ax,#0x1000 ! 将段基址指向下一64K偏移处
 	mov	es,ax	! 改变段值
 	xor	bx,bx

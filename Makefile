@@ -55,4 +55,5 @@ image: clean all buildimg
 buildimg:
 	@dd bs=32 if=boot/bootsect.bin of=boot.img skip=1 ##dd命令，将指定文件写出磁盘 skip=1跳过头1个block，因为该32字节为ld86为minix专用
 	@dd bs=32 if=boot/setup.bin of=boot.img skip=1 seek=16 ##从文件都第513个字节开始写
+	@dd bs=512 if=boot/head.bin of=boot.img skip=8 seek=5 ##前5个扇区为bootsect和setup
 	sync

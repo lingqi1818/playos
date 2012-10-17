@@ -14,8 +14,8 @@ ASMFLAGS	= -0 -a -o
 ##LD86_FLAGS	= -0 -s -o
 LD86_FLAGS	= -0 -o
 
-PLAYOS_BOOTS	= boot/bootsect.bin boot/setup.bin
-OBJS 		= boot/bootsect.o boot/setup.o
+PLAYOS_BOOTS	= boot/bootsect.bin boot/setup.bin boot/head.bin
+OBJS 		= boot/bootsect.o boot/setup.o boot/head.o
 
 # 避免当目标文件存在都时候，goal不执行
 .PHONY : all clean

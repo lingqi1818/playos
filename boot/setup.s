@@ -156,7 +156,7 @@ end_move:
 	mov	al,#0x04	! IR2级联从片
 	out	#0x21,al
 	.word	0x00eb,0x00eb
-	mov	al,#0x02	! 主片都IR号
+	mov	al,#0x02	! 主片的IR号
 	out	#0xa1,al
 	.word	0x00eb,0x00eb
 	
@@ -167,8 +167,8 @@ end_move:
 	out	#0xa1,al
 	.word	0x00eb,0x00eb
 
-	mov	al,#0xff
-	out	#0x21,al	! 屏蔽主芯片所有中断
+	mov	al,#0xfe
+	out	#0x21,al	! 屏蔽主芯片所有中断,打开时钟中断
 	.word	0x00eb,0x00eb	! 屏蔽从芯片所有中断
 	out	#0xa1,al
 	

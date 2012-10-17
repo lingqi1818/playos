@@ -37,7 +37,7 @@ startup_32:
 	movl	$0x00080000,%eax
 	movw	$time_interrupt,%ax
 	movw 	$0x8E00,%dx	#中断门类型，特权级为0
-	movl	$0x08,%ecx	#开机时bios设置的时钟中断向量号，这边直接使用它，你也可以通过对8259A芯片的设置改变向量号，设置方法可以参考《自己动手编写操作系统》第三章
+	movl	$0x20,%ecx	#开机时bios设置的时钟中断向量号，这边直接使用它，你也可以通过对8259A芯片的设置改变向量号，设置方法可以参考《自己动手编写操作系统》第三章
 	lea	idt(,%ecx,8),%esi	#将idt+ecx*8的地址写入esi
 	movl	%eax,(%esi)
 	movl	%edx,4(%esi)

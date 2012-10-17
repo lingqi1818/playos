@@ -128,14 +128,82 @@ end_move:
 	mov	ds,ax
 	lidt	idt_48
 	lgdt	gdt_48
+
+	call	empty_8042
+	mov	al,#0xd1	! 写数据到8042的p2端口,p2的位1用于A20线的选通
+	out	#0x64,al
+	call	empty_8042	! 等待缓冲区为空，命令被接受
+	mov	al,#0xdf	! 选通A20线
+	out	#0x60,al
+	call	empty_8042
+
+	! icw1
+	mov	al,#0x11	! 需要ICW4，级联，边沿触发，8字节中断向量
+	out	#0x20,al
+	.word	0x00eb,0x00eb	! 每个0x00eb耗费CPU7-10个时钟周期延迟，如果用nop指令则耗费3个
+	out	#0xa0,al
+	.word	0x00eb,0x00eb
+	
+	! icw2
+	mov	al,#0x20	! 主芯片，中断号从0x20开始
+	out	#0x21,al
+	.word	0x00eb,0x00eb
+	mov	al,#0x28	! 从芯片，中断号从0x28开始
+	out	#0xa1,al
+	.word	0x00eb,0x00eb
+
+	! icw3
+	mov	al,#0x04	! IR2级联从片
+	out	#0x21,al
+	.word	0x00eb,0x00eb
+	mov	al,#0x02	! 主片都IR号
+	out	#0xa1,al
+	.word	0x00eb,0x00eb
+	
+	! icw4
+	mov	al,#0x01	! 80x86模式
+	out	#0x21,al
+	.word	0x00eb,0x00eb
+	out	#0xa1,al
+	.word	0x00eb,0x00eb
+
+	mov	al,#0xff
+	out	#0x21,al	! 屏蔽主芯片所有中断
+	.word	0x00eb,0x00eb	! 屏蔽从芯片所有中断
+	out	#0xa1,al
+	
+	mov	ax,#0x0001
+	lmsw	ax
+	jmpi	0,8
+
+! 只有当8042键盘控制器的输入缓冲器为空时（状态寄存器位1=0）,才可以对其进行写命令
+empty_8042:
+	.word	0x00eb,0x00eb	! 跳转指令机器码（跳转到下一句），相当于延时
+	in	al,#0x64	! 8042 status port
+	test	al,#2
+	jnz	empty_8042	! 不为空，进入死循环
+	ret
+	
+gdt:
+	.word	0,0,0,0
+	.word	0x07ff	! 段界限为2048*4K=8M
+	.word	0x0000	! 基地址为0
+	.word	0x9a00	! 代码段为只读，可执行
+	.word	0x00c0	! 颗粒读为4K，32位模式
+
+	.word	0x07ff	! 段界限为2048*4K=8M
+	.word	0x0000	! 基地址为0
+	.word	0x9200	! 数据段，可读写
+	.word	0x00c0	! 颗粒读为4K，32位模式
 	
 ! cpu进入保护模式需要设置IDT，先设置个空表
 idt_48:
 	.word	0	! idt limit
-	.word	0,0	! idt base
+	.word	0,0	! idt base，
 
 gdt_48:
-die:jmp die
+	.word	0x800	! gdt limit 2K，256 gdt entries
+	.word	512+gdt,0x9	! gdt base 0x90200+gdt
 .text
 endtext:
 .data

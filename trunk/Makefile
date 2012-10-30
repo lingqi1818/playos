@@ -5,7 +5,7 @@
 ####################################
 
 ASM		= as86
-ASM_LD		= ld86
+ASM_LD		= ld86 -0
 AS		= as
 LD		= ld
 ##LD_FLAGS	=-s -x -M
@@ -13,9 +13,11 @@ LD_FLAGS	=-x -M
 ASMFLAGS	= -0 -a -o
 ##LD86_FLAGS	= -0 -s -o
 LD86_FLAGS	= -0 -o
+CC		= gcc
+CFLAGS		= -c
 
-PLAYOS_BOOTS	= boot/bootsect.bin boot/setup.bin boot/head.bin
-OBJS 		= boot/bootsect.o boot/setup.o boot/head.o
+PLAYOS_SECTS	= boot/bootsect.bin boot/setup.bin tools/system
+OBJS 		= boot/bootsect.o boot/setup.o boot/head.o init/main.o
 
 # 避免当目标文件存在都时候，goal不执行
 .PHONY : all clean
@@ -23,10 +25,10 @@ OBJS 		= boot/bootsect.o boot/setup.o boot/head.o
 default:
 	@echo "please run with make image :-)"
 # 默认执行所有
-all: ${OBJS} ${PLAYOS_BOOTS} 
+all: ${OBJS} ${PLAYOS_SECTS} 
 
 clean :
-	@rm -rf ${OBJS} ${PLAYOS_BOOTS} boot.img System.map ## 加上@符号就不会打印执行都命令本身
+	@rm -rf ${OBJS} ${PLAYOS_SECTS} boot.img System.map ## 加上@符号就不会打印执行都命令本身
 
 ## bootsect程序
 boot/bootsect.o : boot/bootsect.s
@@ -45,9 +47,13 @@ boot/setup.bin:
 ## head程序
 boot/head.o : boot/head.s
 
-boot/head.bin:boot/head.o
-	@${LD} ${LD_FLAGS} -m elf_i386 -Ttext 0 -e startup_32  -o $@ $< > System.map
-	
+## main入口程序
+init/main.o : init/main.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+
+tools/system:	boot/head.o init/main.o
+	$(LD) $(LDFLAGS) -m elf_i386 -Ttext 0 -e startup_32  boot/head.o init/main.o -o tools/system > System.map
 
 
 image: clean all buildimg
@@ -55,5 +61,5 @@ image: clean all buildimg
 buildimg:
 	@dd bs=32 if=boot/bootsect.bin of=boot.img skip=1 ##dd命令，将指定文件写出磁盘 skip=1跳过头1个block，因为该32字节为ld86为minix专用
 	@dd bs=32 if=boot/setup.bin of=boot.img skip=1 seek=16 ##从文件都第513个字节开始写
-	@dd bs=512 if=boot/head.bin of=boot.img skip=8 seek=5 ##前5个扇区为bootsect和setup
+	@dd bs=512 if=tools/system of=boot.img skip=8 seek=5 ##前5个扇区为bootsect和setup
 	sync

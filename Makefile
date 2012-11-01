@@ -16,11 +16,16 @@ LD86_FLAGS	= -0 -o
 CC		= gcc
 CFLAGS		= -c
 
+ARCHIVES=fs/fs.o
 PLAYOS_SECTS	= boot/bootsect.bin boot/setup.bin tools/system
 OBJS 		= boot/bootsect.o boot/setup.o boot/head.o init/main.o
-
+CPP	=cpp -nostdinc -Iinclude
 # 避免当目标文件存在都时候，goal不执行
 .PHONY : all clean
+
+.c.o:
+	$(CC) $(CFLAGS) \
+	-nostdinc -Iinclude -c -o $*.o $<
 
 default:
 	@echo "please run with make image :-)"
@@ -47,15 +52,14 @@ boot/setup.bin:
 ## head程序
 boot/head.o : boot/head.s
 
-## main入口程序
-init/main.o : init/main.c
-	$(CC) $(CFLAGS) -o $@ $<
+tools/system:	boot/head.o init/main.o $(ARCHIVES)
+	$(LD) $(LDFLAGS) -m elf_i386 -Ttext 0 -e startup_32  boot/head.o init/main.o \
+	$(ARCHIVES) \
+	-o tools/system > System.map
 
-
-tools/system:	boot/head.o init/main.o
-	$(LD) $(LDFLAGS) -m elf_i386 -Ttext 0 -e startup_32  boot/head.o init/main.o -o tools/system > System.map
-
-
+fs/fs.o:
+	(cd fs; make)
+	
 image: clean all buildimg
 
 buildimg:
@@ -63,3 +67,13 @@ buildimg:
 	@dd bs=32 if=boot/setup.bin of=boot.img skip=1 seek=16 ##从文件都第513个字节开始写
 	@dd bs=512 if=tools/system of=boot.img skip=8 seek=5 ##前5个扇区为bootsect和setup
 	sync
+	
+
+dep:
+	sed '/\#\#\# Dependencies/q' < Makefile > tmp_make
+	(for i in init/*.c;do echo -n "init/";$(CPP) -M $$i;done) >> tmp_make
+	cp tmp_make Makefile
+	(cd fs; make dep)
+	
+### Dependencies:
+init/main.o: init/main.c include/linux/fs.h

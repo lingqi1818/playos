@@ -78,7 +78,7 @@ ignore_int:
 
 
 write_char:
-	mov	$67,%ax
+	mov	4(%esp),%ax
 	push	%gs
 	pushl	%ebx
 	movl	$0x18,%ebx

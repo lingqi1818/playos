@@ -6,7 +6,7 @@ struct drive_info {
 	char dummy[32];
 } drive_info;//硬盘参数表
 
-//void write_char(void);
+void write_char(char);
 static long memory_end=0;
 static long	buffer_memory_end=0;//高速缓冲区末端
 static long	main_memory_start=0;//主内存开始位置（用于分页）
@@ -28,7 +28,11 @@ void main(void)
 	//TODO 虚拟盘都问题以后再做研究
 
 
-//	int i;
-//	for(i=0;i<10;i++)
-//	write_char();
+	write_char('P');
+	write_char('l');
+	write_char('a');
+	write_char('y');
+	write_char(' ');
+	write_char('O');
+	write_char('S');
 }

@@ -4,12 +4,13 @@
 # mail:lingqi1818@gmail.com        # 
 ####################################
 
-LD	=gld
+LD	=ld
+LD_FLAGS	=-x -M
 CPP	=gcc -E -nostdinc -I../include
 OBJS=	super.o
 	
 fs.o: $(OBJS)
-	$(LD) -r -o fs.o $(OBJS)
+	$(LD) ${LD_FLAGS} -o fs.o $(OBJS)
 	
 dep:
 	sed '/\#\#\# Dependencies/q' < Makefile > tmp_make

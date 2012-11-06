@@ -4,7 +4,6 @@
 # mail:lingqi1818@gmail.com
 #
 # 注意：此时程序已经进入保护模式，所以寻址方式为：段选择子+偏移
-.global write_char
 .text
 _pg_dir:	#页目录将会存放在这里，也就是地址0x00000
 startup_32:
@@ -75,29 +74,6 @@ setup_gdt:
 	ret
 
 ignore_int:
-
-
-write_char:
-	mov	4(%esp),%ax
-	push	%gs
-	pushl	%ebx
-	movl	$0x18,%ebx
-	mov	%bx,%gs
-	movl	scr_loc,%ebx
-	shl	$1,%ebx # 屏幕中每个字符占2个字节，其中一个为属性字节
-	movb	$0x0f,%ah # 0000: 黑底    1111: 白字
-	mov	%ax,%gs:(%ebx)
-	shr	$1,%ebx
-	incl	%ebx
-	cmpl	$2000,%ebx
-	jb	1f
-	movl	$0,%ebx
-1:	movl	%ebx,scr_loc
-	popl	%ebx
-	pop	%gs
-	ret	
-
-scr_loc:.long 0 #屏幕当前位置
 
 .org	0x1000
 pg0:

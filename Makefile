@@ -8,15 +8,15 @@ ASM		= as86
 ASM_LD		= ld86 -0
 AS		= as
 LD		= ld
-##LD_FLAGS	=-s -x -M
-LD_FLAGS	=-x -M
+##LD_FLAGS	=-s -x
+LD_FLAGS	=-x
 ASMFLAGS	= -0 -a -o
 ##LD86_FLAGS	= -0 -s -o
 LD86_FLAGS	= -0 -o
 CC		= gcc
 CFLAGS		= -c
 
-ARCHIVES=fs/fs.o
+ARCHIVES=fs/fs.o mm/mm.o lib/string.o
 PLAYOS_SECTS	= boot/bootsect.bin boot/setup.bin tools/system
 OBJS 		= boot/bootsect.o boot/setup.o boot/head.o init/main.o
 CPP	=cpp -nostdinc -Iinclude
@@ -33,7 +33,7 @@ default:
 all: ${OBJS} ${PLAYOS_SECTS} 
 
 clean :
-	@rm -rf ${OBJS} ${PLAYOS_SECTS} boot.img System.map ## 加上@符号就不会打印执行都命令本身
+	@rm -rf ${OBJS} ${PLAYOS_SECTS} ${ARCHIVES} boot.img System.map ## 加上@符号就不会打印执行都命令本身
 
 ## bootsect程序
 boot/bootsect.o : boot/bootsect.s
@@ -55,10 +55,13 @@ boot/head.o : boot/head.s
 tools/system:	boot/head.o init/main.o $(ARCHIVES)
 	$(LD) $(LDFLAGS) -m elf_i386 -Ttext 0 -e startup_32  boot/head.o init/main.o \
 	$(ARCHIVES) \
-	-o tools/system > System.map
+	-o tools/system
 
 fs/fs.o:
 	(cd fs; make)
+	
+mm/mm.o:
+	(cd mm; make)
 	
 image: clean all buildimg
 
@@ -74,6 +77,7 @@ dep:
 	(for i in init/*.c;do echo -n "init/";$(CPP) -M $$i;done) >> tmp_make
 	cp tmp_make Makefile
 	(cd fs; make dep)
+	(cd mm; make dep)
 	
 ### Dependencies:
 init/main.o: init/main.c include/linux/fs.h

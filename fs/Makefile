@@ -5,7 +5,7 @@
 ####################################
 
 LD	=ld
-LD_FLAGS	=-x -M
+LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../include
 OBJS=	super.o
 	

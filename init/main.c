@@ -7,11 +7,22 @@ struct drive_info {
 } drive_info;//硬盘参数表
 
 void write_char(char);
+void start(){
+		write_char('P');
+		write_char('l');
+		write_char('a');
+		write_char('y');
+		write_char(' ');
+		write_char('O');
+		write_char('S');
+		write_char(' ');
+}
 static long memory_end=0;
 static long	buffer_memory_end=0;//高速缓冲区末端
 static long	main_memory_start=0;//主内存开始位置（用于分页）
 void main(void)
 {
+	start();
 	ROOT_DEV = ORIG_ROOT_DEV;
 	drive_info = DRIVE_INFO;
 	memory_end = (1<<20)+(EXT_MEM_K<<10); //内存大小=1M+扩展内存（K）*1024 字节
@@ -25,14 +36,7 @@ void main(void)
 	else
 		buffer_memory_end = 1*1024*1024;
 		main_memory_start =	buffer_memory_end;//主内存起始位置=缓冲区末端
-	//TODO 虚拟盘都问题以后再做研究
+		//TODO 虚拟盘都问题以后再做研究
 
-
-	write_char('P');
-	write_char('l');
-	write_char('a');
-	write_char('y');
-	write_char(' ');
-	write_char('O');
-	write_char('S');
+		mem_init(main_memory_start,memory_end);
 }

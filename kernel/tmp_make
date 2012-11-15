@@ -1,0 +1,23 @@
+####################################
+# Makefile for playos's kernel     #
+# author:ke.chenk                  #
+# mail:lingqi1818@gmail.com        # 
+####################################
+
+LD	=ld
+LD_FLAGS	=-x -r
+CPP	=gcc -E -nostdinc -I../include
+OBJS=	traps.o
+
+kernel.o: $(OBJS)
+	$(LD) ${LD_FLAGS} -o kernel.o $(OBJS)
+	
+dep:
+	sed '/\#\#\# Dependencies/q' < Makefile > tmp_make
+	(for i in *.c;do $(CPP) -M $$i;done) >> tmp_make
+	cp tmp_make Makefile
+	
+### Dependencies:
+printk.o: printk.c ../include/stdarg.h
+traps.o: traps.c ../include/asm/system.h
+vsprintf.o: vsprintf.c ../include/stdarg.h

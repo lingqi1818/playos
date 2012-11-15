@@ -16,7 +16,7 @@ LD86_FLAGS	= -0 -o
 CC		= gcc
 CFLAGS		= -c
 
-ARCHIVES=fs/fs.o mm/mm.o lib/string.o
+ARCHIVES=fs/fs.o mm/mm.o lib/string.o kernel/kernel.o
 PLAYOS_SECTS	= boot/bootsect.bin boot/setup.bin tools/system
 OBJS 		= boot/bootsect.o boot/setup.o boot/head.o init/main.o
 CPP	=cpp -nostdinc -Iinclude
@@ -63,6 +63,9 @@ fs/fs.o:
 mm/mm.o:
 	(cd mm; make)
 	
+kernel/kernel.o:
+	(cd kernel; make)
+	
 image: clean all buildimg
 
 buildimg:
@@ -78,6 +81,7 @@ dep:
 	cp tmp_make Makefile
 	(cd fs; make dep)
 	(cd mm; make dep)
+	(cd kernel; make dep)
 	
 ### Dependencies:
 init/main.o: init/main.c include/linux/fs.h

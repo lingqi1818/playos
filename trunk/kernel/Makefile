@@ -7,7 +7,7 @@
 LD	=ld
 LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../include
-OBJS=	traps.o
+OBJS=	traps.o printk.o vsprintf.o
 .c.o:
 	$(CC) $(CFLAGS) \
 	-nostdinc -I../include -c -o $*.o $<

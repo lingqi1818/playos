@@ -2,9 +2,11 @@
  * 本程序主要用于对参数产生格式化的输出
  */
 #include <stdarg.h>
+#include <string.h>
+
 #define is_digit(c)	((c) >= '0' && (c) <= '9')
 
-static int skip_atoi(const **s) {
+static int skip_atoi(const char **s) {
 	int i = 0;
 
 	while (is_digit(**s))

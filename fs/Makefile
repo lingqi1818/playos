@@ -8,10 +8,18 @@ LD	=ld
 LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../include
 OBJS=	super.o
+CC		= gcc
+CFLAGS		= -c
+
+.c.o:
+	$(CC) $(CFLAGS) \
+	-nostdinc -fno-builtin -I../include -O -o $*.o $<
 	
 fs.o: $(OBJS)
 	$(LD) ${LD_FLAGS} -o fs.o $(OBJS)
-	
+
+clean:
+	rm	-rf $(OBJS)
 dep:
 	sed '/\#\#\# Dependencies/q' < Makefile > tmp_make
 	(for i in *.c;do $(CPP) -M $$i;done) >> tmp_make

@@ -8,12 +8,18 @@ LD	=ld
 LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../include
 OBJS=	traps.o printk.o vsprintf.o
+CC		= gcc
+## -fno-stack-protector去掉对栈的保护，否则可能出现：undefined reference to `__stack_chk_fail'
+CFLAGS		= -c -fno-stack-protector 
 .c.o:
 	$(CC) $(CFLAGS) \
-	-nostdinc -I../include -c -o $*.o $<
+	-nostdinc -fno-builtin -I../include -O -o $*.o $<
 	
 kernel.o: $(OBJS)
 	$(LD) ${LD_FLAGS} -o kernel.o $(OBJS)
+	
+clean:
+	rm -rf $(OBJS)
 	
 dep:
 	sed '/\#\#\# Dependencies/q' < Makefile > tmp_make
@@ -23,4 +29,4 @@ dep:
 ### Dependencies:
 printk.o: printk.c ../include/stdarg.h
 traps.o: traps.c ../include/asm/system.h
-vsprintf.o: vsprintf.c ../include/stdarg.h
+vsprintf.o: vsprintf.c ../include/stdarg.h ../include/string.h

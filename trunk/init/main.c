@@ -1,5 +1,6 @@
 #include <linux/fs.h>
 #include <asm/system.h>
+#include <linux/sched.h>
 #define EXT_MEM_K (*(unsigned short *)0x90002)	//扩展内存大小
 #define ORIG_ROOT_DEV (*(unsigned short *)0x901FC)//ROOT_DEV设备号，在bootsect中定义（508字节处），由于bootsect被加载到0x90000~~0x901ff处，所以ROOT_DEV地址为0x901FC。
 #define DRIVE_INFO (*(struct drive_info *)0x90080)	//第一个硬盘信息
@@ -41,9 +42,9 @@ void main(void)
 
 		mem_init(main_memory_start,memory_end);//主内存初始化
 		trap_init();//硬件中断向量初始化
-		//TODO 其他初始化信息
-
-
-
+		sched_init();
+		//TODO,其他模块初始化
+		sti();
+		move_to_user_mode();//从内核态进入用户态，init进程开始
 
 }

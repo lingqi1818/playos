@@ -15,7 +15,7 @@ OBJS=	tty_io.o
 	-nostdinc -I../../include -c -o $*.o $<
 	
 chr_drv.a: $(OBJS)
-	$(AR) chr_drv.a $(OBJS)
+	$(AR) rcs chr_drv.a $(OBJS)
 	sync
 	
 dep:

@@ -12,6 +12,8 @@ union task_union {
 	char stack[PAGE_SIZE];
 };//每个任务都定义了4K的栈空间
 
+long volatile jiffies=0;
+
 static union task_union init_task = {INIT_TASK,};
 struct task_struct * task[NR_TASKS] = {&(init_task.task), };
 //时钟中断和系统调用，定义在system_call.s中

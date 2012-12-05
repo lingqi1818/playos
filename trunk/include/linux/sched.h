@@ -53,6 +53,12 @@ struct tss_struct {
 };
 
 struct task_struct {
+	long state;	/* -1 unrunnable, 0 runnable, >0 stopped */
+	long counter;
+	long priority;
+	long signal;
+	struct sigaction sigaction[32];
+	long blocked;	/* bitmap of masked signals */
 	/* ldt for this task 0 - zero 1 - cs 2 - ds&ss */
 	struct desc_struct ldt[3];
 	/* tss for this task */

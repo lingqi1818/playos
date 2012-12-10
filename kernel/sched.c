@@ -5,6 +5,11 @@
 #include <asm/system.h>
 #include <sys/types.h>
 #include <asm/io.h>
+#include <signal.h>
+
+#define _S(nr) (1<<((nr)-1))
+#define _BLOCKABLE (~(_S(SIGKILL) | _S(SIGSTOP)))
+
 #define LATCH (1193180/HZ)
 
 union task_union {
@@ -16,6 +21,7 @@ long volatile jiffies=0;
 
 static union task_union init_task = {INIT_TASK,};
 struct task_struct * task[NR_TASKS] = {&(init_task.task), };
+struct task_struct *current = &(init_task.task);
 //时钟中断和系统调用，定义在system_call.s中
 extern int timer_interrupt(void);
 extern int system_call(void);
@@ -55,3 +61,81 @@ void sched_init(void) {
 	outb(inb_p(0x21)&~0x01,0x21);//允许时钟中断
 	set_system_gate(0x80,&system_call);//设置系统调用中断门
 }
+
+
+
+void do_timer(long cpl)
+{
+	extern int beepcount;
+	extern void sysbeepstop(void);
+
+	if (beepcount)
+		if (!--beepcount)
+			sysbeepstop();
+
+	if (cpl)
+		current->utime++;
+	else
+		current->stime++;
+/* 注销部分为0.11的定时器代码
+	if (next_timer) {
+		next_timer->jiffies--;
+		while (next_timer && next_timer->jiffies <= 0) {
+			void (*fn)(void);
+
+			fn = next_timer->fn;
+			next_timer->fn = NULL;
+			next_timer = next_timer->next;
+			(fn)();
+		}
+	}
+	if (current_DOR & 0xf0)
+		do_floppy_timer();*/
+	if ((--current->counter)>0) return;
+	current->counter=0;
+	if (!cpl) return;
+	schedule();
+}
+
+
+
+void schedule(void)
+{
+	int i,next,c;
+	struct task_struct ** p;
+
+/* check alarm, wake up any interruptible tasks that have got a signal */
+
+	for(p = &LAST_TASK ; p > &FIRST_TASK ; --p)
+		if (*p) {
+			if ((*p)->alarm && (*p)->alarm < jiffies) {//报警时间已经到了，因为小于滴答数（jiffies）
+					(*p)->signal |= (1<<(SIGALRM-1));
+					(*p)->alarm = 0;
+				}
+			if (((*p)->signal & ~(_BLOCKABLE & (*p)->blocked)) &&
+			(*p)->state==TASK_INTERRUPTIBLE)
+				(*p)->state=TASK_RUNNING;
+		}
+
+/* this is the scheduler proper: */
+
+	while (1) {
+		c = -1;
+		next = 0;
+		i = NR_TASKS;
+		p = &task[NR_TASKS];
+		while (--i) {
+			if (!*--p)
+				continue;
+			if ((*p)->state == TASK_RUNNING && (*p)->counter > c)
+				c = (*p)->counter, next = i;
+		}
+		if (c) break;
+		for(p = &LAST_TASK ; p > &FIRST_TASK ; --p)
+			if (*p)
+				(*p)->counter = ((*p)->counter >> 1) +
+						(*p)->priority;
+	}
+	switch_to(next);
+}
+

@@ -86,4 +86,6 @@ dep:
 	(cd kernel; make dep)
 	
 ### Dependencies:
-init/main.o: init/main.c include/linux/fs.h
+init/main.o: init/main.c include/unistd.h include/linux/fs.h \
+ include/asm/system.h include/linux/sched.h include/linux/head.h \
+ include/linux/mm.h include/signal.h

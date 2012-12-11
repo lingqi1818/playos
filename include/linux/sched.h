@@ -9,6 +9,7 @@
 
 #include <linux/head.h>
 #include <linux/mm.h>
+#include <signal.h>
 
 #define TASK_RUNNING		0
 #define TASK_INTERRUPTIBLE	1
@@ -21,6 +22,7 @@
 #define FIRST_TASK task[0]
 #define LAST_TASK task[NR_TASKS-1]
 
+typedef int (*fn_ptr)();
 /*
  * Entry into gdt where to find first TSS. 0-nul, 1-cs, 2-ds, 3-syscall
  * 4-TSS0, 5-LDT0, 6-TSS1 etc ...
@@ -38,12 +40,12 @@ extern void sched_init(void);
 
 #define switch_to(n) {\
 struct {long a,b;} __tmp; \
-__asm__("cmpl %%ecx,_current\n\t" \
+__asm__("cmpl %%ecx,current\n\t" \
 	"je 1f\n\t" \
 	"movw %%dx,%1\n\t" \
-	"xchgl %%ecx,_current\n\t" \
+	"xchgl %%ecx,current\n\t" \
 	"ljmp %0\n\t" \
-	"cmpl %%ecx,_last_task_used_math\n\t" \
+	"cmpl %%ecx,last_task_used_math\n\t" \
 	"jne 1f\n\t" \
 	"clts\n" \
 	"1:" \
@@ -96,10 +98,14 @@ struct task_struct {
 
 #define INIT_TASK \
 		{ \
+			0,15,15, \
+			0,{{},}, \
+			0, \
+			0,0,0,0,0,0, \
 			{ \
 			{0,0}, \
 /* ldt */	{0x9f,0xc0fa00}, \
-			{0x9f,0xc0f200}, \
+			{0x9f,0xc0f200}  \
 			}, \
 			{0,PAGE_SIZE+(long)&init_task,0x10,0,0,0,0,(long)&pg_dir,\
 			0,0,0,0,0,0,0,0, \

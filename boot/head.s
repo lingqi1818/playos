@@ -5,7 +5,7 @@
 #
 # 注意：此时程序已经进入保护模式，所以寻址方式为：段选择子+偏移
 .text
-.globl idt,gdt
+.globl idt,gdt,pg_dir
 pg_dir:	#页目录将会存放在这里，也就是地址0x00000
 startup_32:
 	movl	$0x10,%eax	# 数据段选择子
@@ -59,7 +59,7 @@ setup_idt:
 	movl	$0x00080000,%eax	#0x08代码段选择子
 	movw	%dx,%ax
 	movw	$0x8e00,%dx	#中断门，dpl=0,present
-	lea	_idt,%edi
+	lea	idt,%edi
 	mov	$256,%ecx
 rp_sidt:
 	movl	%eax,(%edi)

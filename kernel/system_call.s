@@ -30,6 +30,14 @@ nr_system_calls = 72 ##系统调用总数
 
 .globl system_call,timer_interrupt
 
+bad_sys_call:
+	movl $-1,%eax
+	iret
+
+reschedule:
+	pushl $ret_from_sys_call
+	jmp schedule
+
 system_call:
 	cmpl $nr_system_calls-1,%eax
 	ja bad_sys_call
@@ -44,16 +52,16 @@ system_call:
 	mov %dx,%es
 	movl $0x17,%edx		# fs points to local data space
 	mov %dx,%fs
-	call _sys_call_table(,%eax,4)
+	call sys_call_table(,%eax,4)
 	pushl %eax
-	movl _current,%eax
+	movl current,%eax
 	cmpl $0,state(%eax)		# state
 	jne reschedule
 	cmpl $0,counter(%eax)		# counter
 	je reschedule
 ret_from_sys_call:
-	movl _current,%eax		# task[0] cannot have signals
-	cmpl _task,%eax
+	movl current,%eax		# task[0] cannot have signals
+	cmpl task,%eax
 	je 3f
 	cmpw $0x0f,CS(%esp)		# was old code segment supervisor ?
 	jne 3f
@@ -69,7 +77,7 @@ ret_from_sys_call:
 	movl %ebx,signal(%eax)
 	incl %ecx
 	pushl %ecx
-	call _do_signal
+#	call do_signal
 	popl %eax
 3:	popl %eax
 	popl %ebx

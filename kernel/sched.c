@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <asm/io.h>
 #include <signal.h>
+#include <linux/sys.h>
 
 #define _S(nr) (1<<((nr)-1))
 #define _BLOCKABLE (~(_S(SIGKILL) | _S(SIGSTOP)))
@@ -22,6 +23,7 @@ long volatile jiffies=0;
 static union task_union init_task = {INIT_TASK,};
 struct task_struct * task[NR_TASKS] = {&(init_task.task), };
 struct task_struct *current = &(init_task.task);
+struct task_struct *last_task_used_math = NULL;
 //时钟中断和系统调用，定义在system_call.s中
 extern int timer_interrupt(void);
 extern int system_call(void);
@@ -66,12 +68,12 @@ void sched_init(void) {
 
 void do_timer(long cpl)
 {
-	extern int beepcount;
-	extern void sysbeepstop(void);
-
-	if (beepcount)
-		if (!--beepcount)
-			sysbeepstop();
+//	extern int beepcount;
+//	extern void sysbeepstop(void);
+//
+//	if (beepcount)
+//		if (!--beepcount)
+//			sysbeepstop();
 
 	if (cpl)
 		current->utime++;

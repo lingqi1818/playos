@@ -1,8 +1,6 @@
 #define __LIBRARY__
 #include <unistd.h>
 
-static inline _syscall0(int,fork)
-
 #include <linux/fs.h>
 #include <asm/system.h>
 #include <linux/sched.h>
@@ -51,5 +49,7 @@ void main(void)
 		//TODO,其他模块初始化
 		sti();
 		move_to_user_mode();//从内核态进入用户态，init进程开始
+		while(1)
+		write_char('u');
 
 }

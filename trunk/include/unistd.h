@@ -92,5 +92,4 @@ return -1; \
 #endif
 
 extern int errno;
-int fork(void);
 #endif

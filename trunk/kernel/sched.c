@@ -22,6 +22,13 @@ long volatile jiffies=0;
 
 static union task_union init_task = {INIT_TASK,};
 struct task_struct * task[NR_TASKS] = {&(init_task.task), };
+long user_stack [ PAGE_SIZE>>2 ] ;
+
+struct {
+	long * a;
+	short b;
+	} stack_start = { & user_stack [PAGE_SIZE>>2] , 0x10 };
+
 struct task_struct *current = &(init_task.task);
 struct task_struct *last_task_used_math = NULL;
 //时钟中断和系统调用，定义在system_call.s中

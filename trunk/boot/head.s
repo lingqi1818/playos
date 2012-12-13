@@ -1,6 +1,6 @@
-# 
+#
 # 本程序功能为：内核system模块的头部代码，设置gdt,idt，校验A20线是否有效，跳入main函数
-# author:ke.chenk             		            
+# author:ke.chenk
 # mail:lingqi1818@gmail.com
 #
 # 注意：此时程序已经进入保护模式，所以寻址方式为：段选择子+偏移
@@ -13,18 +13,18 @@ startup_32:
 	mov	%ax,%es
 	mov	%ax,%fs
 	mov	%ax,%gs
-	lss	_stack_start,%esp
+	lss	stack_start,%esp
 
 	call	setup_idt
 	call	setup_gdt
-	
+
 	movl	$0x10,%eax
 	mov	%ax,%ds
 	mov	%ax,%es
 	mov	%ax,%fs
 	mov	%ax,%gs
-	lss	_stack_start,%esp
-	
+	lss	stack_start,%esp
+
 	xorl	%eax,%eax
 1:	incl	%eax
 	movl	%eax,0x000000
@@ -69,7 +69,7 @@ rp_sidt:
 	jne	rp_sidt
 	lidt	idt_descr
 	ret
-	
+
 setup_gdt:
 	lgdt	gdt_descr
 	ret
@@ -115,8 +115,4 @@ gdt:	.quad 0x0000000000000000
 	.quad 0x00c0920000000fff	#数据段
 	.quad 0x00c0920b80000002	#显存段，界限为2*4k
 	.fill	252,8,0
-
-_stack_start:		#注意，汇编的堆栈是高地址向低地址伸展，所以，需要在之前开辟空闲都空间
-	.long _stack_start	#堆栈段偏移位置
-	.word 0x10		#堆栈段同内核数据段
 

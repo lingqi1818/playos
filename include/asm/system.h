@@ -7,7 +7,7 @@
 /*堆栈段选择符入栈*/	"pushl $0x17\n\t" \
 /*esp入栈*/			"pushl %%eax\n\t" \
 /*标志寄存器入栈*/		"pushfl\n\t" \
-/*task0断码段cs入栈*/	"pushl $0x0f\n\t" \
+/*task0代码段cs入栈*/	"pushl $0x0f\n\t" \
 /*task0 eip*/		"pushl $1f\n\t" \
 /*中断返回跳转到1处，任务0开始运行*/	"iret\n" \
 /*后面为任务0初始化操作*/	"1:\tmovl $0x17,%%eax\n\t" \

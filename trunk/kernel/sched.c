@@ -21,7 +21,8 @@ union task_union {
 long volatile jiffies=0;
 
 static union task_union init_task = {INIT_TASK,};
-struct task_struct * task[NR_TASKS] = {&(init_task.task), };
+static union task_union test_task_1 = {TEST_TASK_1,};
+struct task_struct * task[NR_TASKS] = {&(init_task.task),&(test_task_1.task) };
 long user_stack [ PAGE_SIZE>>2 ] ;
 
 struct {
@@ -69,8 +70,18 @@ void sched_init(void) {
 	set_intr_gate(0x20,&timer_interrupt);//设置时钟中断门
 	outb(inb_p(0x21)&~0x01,0x21);//允许时钟中断
 	set_system_gate(0x80,&system_call);//设置系统调用中断门
+	init_task1();
 }
 
+	void init_task1(){
+		task[1]->tss.eip= &task1;
+		task[1]->tss.eflags=0x200;
+	}
+
+	void task1(){
+		while(1)
+		user_write_char('v');
+	}
 
 
 void do_timer(long cpl)

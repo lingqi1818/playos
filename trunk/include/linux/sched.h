@@ -90,7 +90,7 @@ struct task_struct {
 	long alarm;
 	long utime,stime,cutime,cstime,start_time;
 	/* ldt for this task 0 - zero 1 - cs 2 - ds&ss */
-	struct desc_struct ldt[3];
+	struct desc_struct ldt[4];
 	/* tss for this task */
 	struct tss_struct tss;
 };
@@ -105,7 +105,8 @@ struct task_struct {
 			{ \
 			{0,0}, \
 /* ldt */	{0x9f,0xc0fa00}, \
-			{0x9f,0xc0f200}  \
+			{0x9f,0xc0f200}, \
+			{0x80000002,0xc0f20b} \
 			}, \
 			{0,PAGE_SIZE+(long)&init_task,0x10,0,0,0,0,(long)&pg_dir,\
 			0,0,0,0,0,0,0,0, \

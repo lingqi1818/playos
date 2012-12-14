@@ -12,6 +12,7 @@ struct drive_info {
 } drive_info;//硬盘参数表
 
 void write_char(char);
+void user_write_char(char);
 void start(){
 		write_char('P');
 		write_char('l');
@@ -50,6 +51,6 @@ void main(void)
 		sti();
 		move_to_user_mode();//从内核态进入用户态，init进程开始
 		while(1)
-		write_char('u');
+		user_write_char('u');
 
 }

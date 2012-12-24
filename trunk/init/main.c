@@ -52,5 +52,4 @@ void main(void)
 		move_to_user_mode();//从内核态进入用户态，init进程开始
 		while(1)
 		user_write_char('u');
-
 }

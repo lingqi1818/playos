@@ -82,7 +82,7 @@ struct tss_struct {
 
 struct task_struct {
 	long state;	/* -1 unrunnable, 0 runnable, >0 stopped */
-	long counter;
+	long counter;//运行时间片
 	long priority;
 	long signal;
 	struct sigaction sigaction[32];
@@ -110,11 +110,12 @@ struct task_struct {
 			}, \
 			{0,PAGE_SIZE+(long)&init_task,0x10,0,0,0,0,(long)&pg_dir,\
 			0,0,0,0,0,0,0,0, \
-			0,0,0x17,0x17,0x17,0x17,0x17,0x17, \
+			0,0,0x17,0x0f,0x17,0x17,0x17,0x17, \
 			_LDT(0),0x80000000 \
 			} \
 		}
-#endif
+
+long task1_stack [ PAGE_SIZE>>2 ] ;
 
 #define TEST_TASK_1 \
 		{ \
@@ -129,9 +130,10 @@ struct task_struct {
 			{0x80000002,0xc0f20b} \
 			}, \
 			{0,PAGE_SIZE+(long)&test_task_1,0x10,0,0,0,0,(long)&pg_dir,\
-			0,0,0,0,0,0,0,0, \
-			0,0,0x17,0x17,0x17,0x17,0x17,0x17, \
+			0,0,0,0,0,0,&task1_stack,0, \
+			0,0,0x17,0x0f,0x17,0x17,0x17,0x17, \
 			_LDT(1),0x80000000 \
 			} \
 		}
+
 #endif

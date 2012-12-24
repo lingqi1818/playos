@@ -8,7 +8,15 @@ AS	=as
 LD	=ld
 LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../../include
+CC		= gcc
+CFLAGS		= -c -g
 OBJS=	tty_io.o
+
+.c.s:
+	$(CC) $(CFLAGS) \
+	-nostdinc -I../../include -S -o $*.s $<
+.s.o:
+	$(AS) -o  $*.o $<
 
 .c.o:
 	$(CC) $(CFLAGS) \

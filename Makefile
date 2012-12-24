@@ -14,7 +14,7 @@ ASMFLAGS	= -0 -a -o
 ##LD86_FLAGS	= -0 -s -o
 LD86_FLAGS	= -0 -o
 CC		= gcc
-CFLAGS		= -c
+CFLAGS		= -c -g
 
 ARCHIVES=fs/fs.o mm/mm.o lib/string.o kernel/kernel.o
 PLAYOS_SECTS	= boot/bootsect.bin boot/setup.bin tools/system
@@ -23,10 +23,16 @@ CPP	=cpp -nostdinc -Iinclude
 # 避免当目标文件存在都时候，goal不执行
 .PHONY : all clean
 
+.c.s:
+	$(CC) $(CFLAGS) \
+	-nostdinc -Iinclude -S -o $*.s $<
+.s.o:
+	$(AS) -o  $*.o $<
+
 .c.o:
 	$(CC) $(CFLAGS) \
 	-nostdinc -fno-builtin -Iinclude -O -o $*.o $<
-
+	
 default:
 	@echo "please run with make image :-)"
 # 默认执行所有

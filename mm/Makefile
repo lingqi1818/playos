@@ -9,7 +9,13 @@ LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../include
 OBJS=	memory.o
 CC		= gcc
-CFLAGS		= -c
+CFLAGS		= -c -g
+
+.c.s:
+	$(CC) $(CFLAGS) \
+	-nostdinc -I../include -S -o $*.s $<
+.s.o:
+	$(AS) -o  $*.o $<
 
 .c.o:
 	$(CC) $(CFLAGS) \

@@ -44,13 +44,17 @@ void sched_init(void) {
 	set_ldt_desc(gdt+FIRST_LDT_ENTRY,&(init_task.task.ldt));
 	p = gdt+2+FIRST_TSS_ENTRY;//p指向tss1
 	//初始化任务的tss和idt都为0
-	for(i=1;i<NR_TASKS;i++) {
+	//for(i=1;i<NR_TASKS;i++) {
+	for(i=2;i<NR_TASKS;i++) {
 			task[i] = NULL;
 			p->a=p->b=0;
 			p++;
 			p->a=p->b=0;
 			p++;
 		}
+	void init_task1();
+	init_task1();
+
 	/*
 	*置NT标志为0
 	*嵌套任务标志NT(Nested Task)
@@ -67,15 +71,25 @@ void sched_init(void) {
 	//那么将数字设置为1193180/100
 	outb_p(LATCH & 0xff , 0x40);//定时值低字节
 	outb(LATCH >> 8 , 0x40);//定时值高字节
+	//void time_print();
 	set_intr_gate(0x20,&timer_interrupt);//设置时钟中断门
+	//set_intr_gate(0x20,&time_print);
 	outb(inb_p(0x21)&~0x01,0x21);//允许时钟中断
 	set_system_gate(0x80,&system_call);//设置系统调用中断门
-	init_task1();
 }
 
+	void time_print(){
+		__asm__("movb $0x20,%%al\n\t"
+			"outb %%al,$0x20"::);
+		write_char('t');
+	}
 	void init_task1(){
-		task[1]->tss.eip= &task1;
+		set_tss_desc(gdt+2+FIRST_TSS_ENTRY,&(test_task_1.task.tss));
+		set_ldt_desc(gdt+2+FIRST_LDT_ENTRY,&(test_task_1.task.ldt));
+		void task1();
+		task[1]->tss.eip=&task1;
 		task[1]->tss.eflags=0x200;
+		task[1]->state=TASK_RUNNING;
 	}
 
 	void task1(){
@@ -138,20 +152,22 @@ void schedule(void)
 		}
 
 /* this is the scheduler proper: */
-
+//被注释都两行逻辑为task[0]不参与进程调度
 	while (1) {
 		c = -1;
 		next = 0;
 		i = NR_TASKS;
 		p = &task[NR_TASKS];
-		while (--i) {
+		//while (--i) {
+		while (i--) {
 			if (!*--p)
 				continue;
 			if ((*p)->state == TASK_RUNNING && (*p)->counter > c)
 				c = (*p)->counter, next = i;
 		}
 		if (c) break;
-		for(p = &LAST_TASK ; p > &FIRST_TASK ; --p)
+		//for(p = &LAST_TASK ; p > &FIRST_TASK ; --p)
+		for(p = &LAST_TASK ; p >= &FIRST_TASK ; --p)
 			if (*p)
 				(*p)->counter = ((*p)->counter >> 1) +
 						(*p)->priority;

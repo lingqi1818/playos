@@ -47,6 +47,7 @@ void main(void)
 		mem_init(main_memory_start,memory_end);//主内存初始化
 		trap_init();//硬件中断向量初始化
 		sched_init();
+		hd_init();
 		//TODO,其他模块初始化
 		sti();
 		move_to_user_mode();//从内核态进入用户态，init进程开始

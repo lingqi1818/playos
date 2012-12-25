@@ -1,16 +1,15 @@
 ############################################
-# Makefile for playos's kernel/chr_drv     #
+# Makefile for playos's kernel/blk_drv     #
 # author:ke.chenk                          #
 # mail:lingqi1818@gmail.com                #
 ############################################
 AR	=ar
 AS	=as
 LD	=ld
-LD_FLAGS	=-x -r
-CPP	=gcc -E -nostdinc -I../../include
-CC		= gcc
+LDFLAGS	= -x
+CC	=gcc
 CFLAGS		= -c -g
-OBJS=	tty_io.o
+CPP	=gcc -E -nostdinc -I../../include
 
 .c.s:
 	$(CC) $(CFLAGS) \
@@ -21,19 +20,21 @@ OBJS=	tty_io.o
 .c.o:
 	$(CC) $(CFLAGS) \
 	-nostdinc -I../../include -c -o $*.o $<
-	
-chr_drv.a: $(OBJS)
-	$(AR) rcs chr_drv.a $(OBJS)
+
+OBJS  = ll_rw_blk.o hd.o
+
+blk_drv.a: $(OBJS)
+	$(AR) rcs blk_drv.a $(OBJS)
 	sync
-	
+
 clean:
 	rm -f $(OBJS)
-	rm -f chr_drv.a
-	
+	rm -f blk_drv.a
+
 dep:
 	sed '/\#\#\# Dependencies/q' < Makefile > tmp_make
-	(for i in *.c;do $(CPP) -M $$i;done) >> tmp_make
+	(for i in *.c;do echo -n `echo $$i | sed 's,\.c,\.s,'`" "; \
+		$(CPP) -M $$i;done) >> tmp_make
 	cp tmp_make Makefile
-	
+
 ### Dependencies:
-tty_io.o: tty_io.c

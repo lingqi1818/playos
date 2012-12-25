@@ -28,7 +28,7 @@ sa_restorer = 12
 
 nr_system_calls = 72 ##系统调用总数
 
-.globl system_call,timer_interrupt
+.globl system_call,timer_interrupt,hd_interrupt
 
 bad_sys_call:
 	movl $-1,%eax
@@ -128,7 +128,7 @@ hd_interrupt:
 	jmp 1f			# give port chance to breathe
 1:	jmp 1f
 1:	xorl %edx,%edx
-	xchgl _do_hd,%edx
+	xchgl do_hd,%edx
 	testl %edx,%edx
 	jne 1f
 	movl $unexpected_hd_interrupt,%edx

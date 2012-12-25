@@ -1,6 +1,6 @@
 #ifndef _BLK_H
 #define _BLK_H
-
+#include <sys/types.h>
 #define NR_REQUEST	32
 
 #define NR_BLK_DEV	7
@@ -41,7 +41,7 @@ extern struct request request[NR_REQUEST];
 #define DEVICE_INTR do_hd
 #define DEVICE_REQUEST do_hd_request
 
-#elif
+#else
 /* unknown blk device */
 #error "unknown blk device"
 
@@ -49,7 +49,6 @@ extern struct request request[NR_REQUEST];
 
 #ifdef DEVICE_INTR
 void (*DEVICE_INTR)(void) = NULL;
-
 #endif
 
 #endif

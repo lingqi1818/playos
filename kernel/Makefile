@@ -27,6 +27,8 @@ kernel.o: $(OBJS)
 	
 clean:
 	rm -rf $(OBJS)
+	(cd chr_drv; make clean)
+	(cd blk_drv; make clean)
 	
 dep:
 	sed '/\#\#\# Dependencies/q' < Makefile > tmp_make

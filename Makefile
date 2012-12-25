@@ -17,6 +17,7 @@ CC		= gcc
 CFLAGS		= -c -g
 
 ARCHIVES=fs/fs.o mm/mm.o lib/string.o kernel/kernel.o
+DRIVERS =kernel/blk_drv/blk_drv.a kernel/chr_drv/chr_drv.a
 PLAYOS_SECTS	= boot/bootsect.bin boot/setup.bin tools/system
 OBJS 		= boot/bootsect.o boot/setup.o boot/head.o init/main.o
 CPP	=cpp -nostdinc -Iinclude
@@ -60,10 +61,17 @@ boot/setup.bin:
 ## head程序
 boot/head.o : boot/head.s
 
-tools/system:	boot/head.o init/main.o $(ARCHIVES)
+tools/system:	boot/head.o init/main.o $(ARCHIVES) $(DRIVERS)
 	$(LD) $(LDFLAGS) -m elf_i386 -Ttext 0 -e startup_32  boot/head.o init/main.o \
 	$(ARCHIVES) \
+	$(DRIVERS) \
 	-o tools/system
+	
+kernel/chr_drv/chr_drv.a:
+	(cd kernel/chr_drv; make)
+
+kernel/blk_drv/blk_drv.a:
+	(cd kernel/blk_drv; make)
 
 fs/fs.o:
 	(cd fs; make)

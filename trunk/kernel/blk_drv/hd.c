@@ -2,19 +2,24 @@
  * 硬盘驱动
  */
 #define MAJOR_NR 3
+#include <linux/sched.h>
+#include <asm/io.h>
+#include <asm/system.h>
 #include "blk.h"
 
+void hd_interrupt(void);
 extern void hd_interrupt(void);
-
-void write_char(char);
+extern void write_char(char);
 void unexpected_hd_interrupt(void)
 {
 	//printk("Unexpected HD interrupt\n\r");
-	write_char("p");
-	write_char("k");
+	write_char('p');
+	write_char('k');
 }
 
+void do_hd_request(void){
 
+}
 void hd_init(void)
 {
 	blk_dev[MAJOR_NR].request_fn = DEVICE_REQUEST;

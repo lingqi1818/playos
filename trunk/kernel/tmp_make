@@ -10,7 +10,14 @@ CPP	=gcc -E -nostdinc -I../include
 OBJS=	traps.o printk.o vsprintf.o sched.o system_call.o
 CC		= gcc
 ## -fno-stack-protector去掉对栈的保护，否则可能出现：undefined reference to `__stack_chk_fail'
-CFLAGS		= -c -fno-stack-protector 
+CFLAGS		= -c -fno-stack-protector -g
+
+.c.s:
+	$(CC) $(CFLAGS) \
+	-nostdinc -I../include -S -o $*.s $<
+.s.o:
+	$(AS)  -o  $*.o $<
+	
 .c.o:
 	$(CC) $(CFLAGS) \
 	-nostdinc -fno-builtin -I../include -O -o $*.o $<
@@ -20,6 +27,8 @@ kernel.o: $(OBJS)
 	
 clean:
 	rm -rf $(OBJS)
+	(cd chr_drv; make clean)
+	(cd blk_drv; make clean)
 	
 dep:
 	sed '/\#\#\# Dependencies/q' < Makefile > tmp_make

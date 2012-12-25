@@ -1,3 +1,4 @@
+#include "blk.h"
 struct blk_dev_struct blk_dev[NR_BLK_DEV] = {
 	{ NULL, NULL },		/* no_dev */
 	{ NULL, NULL },		/* dev mem */

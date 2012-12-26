@@ -10,22 +10,27 @@ LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../../include
 CC		= gcc
 CFLAGS		= -c -g
-OBJS=	tty_io.o
+OBJS=	tty_io.o console.o keyboard.o
 
 .c.s:
 	$(CC) $(CFLAGS) \
-	-nostdinc -I../../include -S -o $*.s $<
+	-nostdinc -fno-builtin -I../../include -S -O -o $*.s $<
 .s.o:
 	$(AS) -o  $*.o $<
 
 .c.o:
 	$(CC) $(CFLAGS) \
-	-nostdinc -I../../include -c -o $*.o $<
+	-nostdinc -fno-builtin -I../../include -O -o $*.o $<
 	
 chr_drv.a: $(OBJS)
 	$(AR) rcs chr_drv.a $(OBJS)
 	sync
-	
+
+##预编译
+keyboard.s: keyboard.S ../../include/linux/config.h
+	$(CPP) -traditional keyboard.S -o keyboard.s
+
+
 clean:
 	rm -f $(OBJS)
 	rm -f chr_drv.a
@@ -36,4 +41,8 @@ dep:
 	cp tmp_make Makefile
 	
 ### Dependencies:
-tty_io.o: tty_io.c
+console.o: console.c ../../include/linux/sched.h \
+ ../../include/linux/head.h ../../include/linux/mm.h \
+ ../../include/signal.h ../../include/linux/tty.h ../../include/termios.h \
+ ../../include/asm/io.h ../../include/asm/system.h
+tty_io.o: tty_io.c ../../include/linux/tty.h ../../include/termios.h

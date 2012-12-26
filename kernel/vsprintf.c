@@ -94,6 +94,10 @@ static char * number(char * str, int num, int base, int size, int precision,
 	return str;
 }
 
+/**
+ * 将字符串格式化后存入buf
+ * return 返回字符串长度
+ */
 int vsprintf(char *buf, const char *fmt, va_list args) {
 	int *ip;
 	int len;

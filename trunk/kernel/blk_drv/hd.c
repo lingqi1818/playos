@@ -17,6 +17,11 @@ void unexpected_hd_interrupt(void)
 	write_char('k');
 }
 
+
+int sys_setup(void * BIOS){
+
+}
+
 void do_hd_request(void){
 
 }

@@ -13,6 +13,15 @@ struct tty_struct tty_table[] = {
 
 }; //tty表，目前只有一个成员：控制台类型
 
+
+
+
+void tty_init(void)
+{
+	con_init();
+}
+
+
 /**
  * channel:设备号，目前只支持控制台类型
  * buf:缓冲区
@@ -29,4 +38,8 @@ int tty_write(unsigned channel, char *buf, int nr) {
 
 	}
 
+}
+
+void chr_dev_init(void)
+{
 }

@@ -8,6 +8,7 @@ extern int vsprintf(char * buf, const char * fmt, va_list args);
 
 int printk(const char *fmt, ...) {
 	va_list args;
+	//将args指向fmt后的第一个参数
 	va_start(args, fmt);
 	//初始化参数列表
 	va_end(args);

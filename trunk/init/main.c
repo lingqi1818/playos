@@ -46,6 +46,8 @@ void main(void)
 
 		mem_init(main_memory_start,memory_end);//主内存初始化
 		trap_init();//硬件中断向量初始化
+		chr_dev_init();
+		tty_init();
 		sched_init();
 		hd_init();
 		//TODO,其他模块初始化

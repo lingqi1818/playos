@@ -1,7 +1,7 @@
 !
 ! 利用BIOS中断，读取机器系统数据，存入0x90000开始都内存位置处，也就是覆盖bootsect
 ! 然后将system模块从0x10000位置挪到0x00000处
-! author:ke.chenk             		            
+! author:ke.chenk
 ! mail:lingqi1818@gmail.com
 !
 
@@ -52,7 +52,7 @@ start:
 	mov	[4],bx
 	mov	[6],ax
 
-	! 检查EGA/VGA显示方式，目前都显卡适配器可以支持吗？？？
+	! 检查EGA/VGA显示方式，目前的显卡适配器可以支持吗？？？
 	mov	ah,#0x12
 	mov	bl,#10 ! 功能号10H — 读取配置信息
 	int	0x10
@@ -195,7 +195,7 @@ gdt:
 	.word	0x0000	! 基地址为0
 	.word	0x9200	! 数据段，可读写
 	.word	0x00c0	! 颗粒读为4K，32位模式
-	
+
 ! cpu进入保护模式需要设置IDT，先设置个空表
 idt_48:
 	.word	0	! idt limit

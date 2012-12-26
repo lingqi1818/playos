@@ -38,3 +38,7 @@ dep:
 	cp tmp_make Makefile
 
 ### Dependencies:
+hd.s hd.o: hd.c ../../include/linux/sched.h ../../include/linux/head.h \
+ ../../include/linux/mm.h ../../include/signal.h ../../include/asm/io.h \
+ ../../include/asm/system.h blk.h ../../include/sys/types.h
+ll_rw_blk.s ll_rw_blk.o: ll_rw_blk.c blk.h ../../include/sys/types.h

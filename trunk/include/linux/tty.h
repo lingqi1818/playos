@@ -25,4 +25,8 @@ struct tty_struct {
 extern struct tty_struct tty_table[];
 #define INIT_CC ""
 
+void con_init(void);
+void tty_init(void);
+
+void con_write(struct tty_struct * tty);
 #endif

@@ -35,6 +35,8 @@ dep:
 	(for i in *.c;do echo -n `echo $$i | sed 's,\.c,\.s,'`" "; \
 		$(CPP) -M $$i;done) >> tmp_make
 	cp tmp_make Makefile
+	(cd chr_drv; make dep)
+	(cd blk_drv; make dep)
 
 ### Dependencies:
 printk.s printk.o: printk.c ../include/stdarg.h

@@ -17,7 +17,7 @@ write_char:
 	mov	%ax,%gs:(%ebx)
 	shr	$1,%ebx
 	incl	%ebx
-	cmpl	$2000,%ebx
+	cmpl	$2000,%ebx /* 80*25模式下，一屏显示2000个字符 */
 	jb	1f
 	movl	$0,%ebx
 1:	movl	%ebx,scr_loc

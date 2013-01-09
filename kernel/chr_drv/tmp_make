@@ -45,4 +45,3 @@ console.o: console.c ../../include/linux/sched.h \
  ../../include/linux/head.h ../../include/linux/mm.h \
  ../../include/signal.h ../../include/linux/tty.h ../../include/termios.h \
  ../../include/asm/io.h ../../include/asm/system.h
-tty_io.o: tty_io.c ../../include/linux/tty.h ../../include/termios.h

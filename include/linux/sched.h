@@ -115,6 +115,11 @@ struct task_struct {
 			} \
 		}
 
+
+extern struct task_struct *task[NR_TASKS];
+extern struct task_struct *last_task_used_math;
+extern struct task_struct *current;
+
 long task1_stack [ PAGE_SIZE>>2 ] ;
 
 #define TEST_TASK_1 \

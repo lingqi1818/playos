@@ -18,6 +18,7 @@ CFLAGS		= -c -g
 
 ARCHIVES=fs/fs.o mm/mm.o lib/string.o kernel/kernel.o
 DRIVERS =kernel/blk_drv/blk_drv.a kernel/chr_drv/chr_drv.a
+LIBS	=lib/lib.a
 PLAYOS_SECTS	= boot/bootsect.bin boot/setup.bin tools/system
 OBJS 		= boot/bootsect.o boot/setup.o boot/head.o init/main.o
 CPP	=cpp -nostdinc -Iinclude
@@ -44,6 +45,7 @@ clean :
 	(cd fs; make clean)
 	(cd mm; make clean)
 	(cd kernel; make clean)
+	(cd lib;make clean)
 ## bootsect程序
 boot/bootsect.o : boot/bootsect.s
 	${ASM} ${ASMFLAGS} $@ $<  ## $<代表依赖都目标，这里为:boot/bootsect.o,$@代表目标，这里为:bootsect.o
@@ -61,10 +63,11 @@ boot/setup.bin:
 ## head程序
 boot/head.o : boot/head.s
 
-tools/system:	boot/head.o init/main.o $(ARCHIVES) $(DRIVERS)
+tools/system:	boot/head.o init/main.o $(ARCHIVES) $(DRIVERS) $(LIBS)
 	$(LD) $(LDFLAGS) -m elf_i386 -Ttext 0 -e startup_32  boot/head.o init/main.o \
 	$(ARCHIVES) \
 	$(DRIVERS) \
+	$(LIBS) \
 	-o tools/system
 	
 kernel/chr_drv/chr_drv.a:
@@ -75,6 +78,9 @@ kernel/blk_drv/blk_drv.a:
 
 fs/fs.o:
 	(cd fs; make)
+	
+lib/lib.a:
+	(cd lib; make)
 	
 mm/mm.o:
 	(cd mm; make)
@@ -98,8 +104,9 @@ dep:
 	(cd fs; make dep)
 	(cd mm; make dep)
 	(cd kernel; make dep)
+	(cd lib;make dep)
 	
 ### Dependencies:
-init/main.o: init/main.c include/unistd.h include/linux/fs.h \
- include/asm/system.h include/linux/sched.h include/linux/head.h \
- include/linux/mm.h include/signal.h
+init/main.o: init/main.c include/unistd.h include/linux/kernel.h \
+ include/linux/fs.h include/asm/system.h include/linux/sched.h \
+ include/linux/head.h include/linux/mm.h include/signal.h

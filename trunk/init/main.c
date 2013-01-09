@@ -1,6 +1,6 @@
 #define __LIBRARY__
 #include <unistd.h>
-
+#include <linux/kernel.h>
 #include <linux/fs.h>
 #include <asm/system.h>
 #include <linux/sched.h>
@@ -11,18 +11,6 @@ struct drive_info {
 	char dummy[32];
 } drive_info;//硬盘参数表
 
-void write_char(char);
-void user_write_char(char);
-void start(){
-		write_char('P');
-		write_char('l');
-		write_char('a');
-		write_char('y');
-		write_char(' ');
-		write_char('O');
-		write_char('S');
-		write_char(' ');
-}
 static long memory_end=0;
 static long	buffer_memory_end=0;//高速缓冲区末端
 static long	main_memory_start=0;//主内存开始位置（用于分页）
@@ -54,5 +42,5 @@ void main(void)
 		sti();
 		move_to_user_mode();//从内核态进入用户态，init进程开始
 		while(1)
-		user_write_char('u');
+		printk("u");
 }

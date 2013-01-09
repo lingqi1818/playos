@@ -48,6 +48,31 @@ static unsigned long npar, par[NPAR]; //ANSI转义字符序列参数个数和参
 static unsigned long ques = 0; //收到问号字符标志
 static unsigned char attr = 0x07; //字符属性，黑底白字
 
+#define RESPONSE "\033[?1;2c"
+
+static void respond(struct tty_struct * tty)
+{
+	char * p = RESPONSE;
+
+	cli();
+	while (*p) {
+		PUTCH(*p,tty->read_q);
+		p++;
+	}
+	sti();
+	copy_to_cooked(tty);
+}
+
+static inline void set_cursor(void)
+{
+	cli();
+	outb_p(14, video_port_reg);
+	outb_p(0xff&((pos-video_mem_start)>>9), video_port_val);
+	outb_p(15, video_port_reg);
+	outb_p(0xff&((pos-video_mem_start)>>1), video_port_val);
+	sti();
+}
+
 static inline void gotoxy(unsigned int new_x, unsigned int new_y) {
 	if (new_x > video_num_columns || new_y >= video_num_lines)
 		return;
@@ -78,14 +103,13 @@ static void scrdown(void)
 			"rep\n\t"
 			"movsl\n\t"
 			"addl $2,%%edi\n\t"	/* %edi has been decremented by 4 */
-			"movl _video_num_columns,%%ecx\n\t"
+			"movl video_num_columns,%%ecx\n\t"
 			"rep\n\t"
 			"stosw"
 			::"a" (video_erase_char),
 			"c" ((bottom-top-1)*video_num_columns>>1),
 			"D" (origin+video_size_row*bottom-4),//由于方向位置反，所以movsl是从每行最后一个双字开始复制的。
-			"S" (origin+video_size_row*(bottom-1)-4)
-			:"ax","cx","di","si");
+			"S" (origin+video_size_row*(bottom-1)-4));
 	}
 	else		/* Not EGA/VGA */
 	{
@@ -93,14 +117,13 @@ static void scrdown(void)
 			"rep\n\t"
 			"movsl\n\t"
 			"addl $2,%%edi\n\t"	/* %edi has been decremented by 4 */
-			"movl _video_num_columns,%%ecx\n\t"
+			"movl video_num_columns,%%ecx\n\t"
 			"rep\n\t"
 			"stosw"
 			::"a" (video_erase_char),
 			"c" ((bottom-top-1)*video_num_columns>>1),
 			"D" (origin+video_size_row*bottom-4),
-			"S" (origin+video_size_row*(bottom-1)-4)
-			:"ax","cx","di","si");
+			"S" (origin+video_size_row*(bottom-1)-4));
 	}
 }
 
@@ -117,14 +140,13 @@ static void scrup(void)
 				__asm__("cld\n\t"
 					"rep\n\t"
 					"movsl\n\t"
-					"movl _video_num_columns,%1\n\t"//当前行冲入空值，cx为0，所以需要重新设置
+					"movl video_num_columns,%1\n\t"//当前行冲入空值，cx为0，所以需要重新设置
 					"rep\n\t"
 					"stosw"
 					::"a" (video_erase_char),
 					"c" ((video_num_lines-1)*video_num_columns>>1),
 					"D" (video_mem_start),
-					"S" (origin)
-					:"cx","di","si");
+					"S" (origin));
 				scr_end -= origin-video_mem_start;
 				pos -= origin-video_mem_start;
 				origin = video_mem_start;
@@ -134,22 +156,20 @@ static void scrup(void)
 					"stosw"
 					::"a" (video_erase_char),
 					"c" (video_num_columns),
-					"D" (scr_end-video_size_row)
-					:"cx","di");
+					"D" (scr_end-video_size_row));
 			}
 			set_origin();
 		} else {
 			__asm__("cld\n\t"
 				"rep\n\t"
 				"movsl\n\t"
-				"movl _video_num_columns,%%ecx\n\t"
+				"movl video_num_columns,%%ecx\n\t"
 				"rep\n\t"
 				"stosw"
 				::"a" (video_erase_char),
 				"c" ((bottom-top-1)*video_num_columns>>1),
 				"D" (origin+video_size_row*top),
-				"S" (origin+video_size_row*(top+1))
-				:"cx","di","si");
+				"S" (origin+video_size_row*(top+1)));
 		}
 	}
 	else		/* Not EGA/VGA  MDA模式每次都需要手工卷屏，不能做到当前屏自动卷动*/
@@ -157,14 +177,13 @@ static void scrup(void)
 		__asm__("cld\n\t"
 			"rep\n\t"
 			"movsl\n\t"
-			"movl _video_num_columns,%%ecx\n\t"
+			"movl video_num_columns,%%ecx\n\t"
 			"rep\n\t"
 			"stosw"
 			::"a" (video_erase_char),
 			"c" ((bottom-top-1)*video_num_columns>>1),
 			"D" (origin+video_size_row*top),
-			"S" (origin+video_size_row*(top+1))
-			:"cx","di","si");
+			"S" (origin+video_size_row*(top+1)));
 	}
 }
 
@@ -216,8 +235,7 @@ static void csi_J(int par)
 		"rep\n\t"
 		"stosw\n\t"
 		::"c" (count),
-		"D" (start),"a" (video_erase_char)
-		:"cx","di");
+		"D" (start),"a" (video_erase_char));
 }
 
 /**
@@ -254,8 +272,7 @@ static void csi_K(int par)
 		"rep\n\t"
 		"stosw\n\t"
 		::"c" (count),
-		"D" (start),"a" (video_erase_char)
-		:"cx","di");
+		"D" (start),"a" (video_erase_char));
 }
 
 /**
@@ -412,6 +429,51 @@ static void restore_cur(void)
 	gotoxy(saved_x, saved_y);
 }
 
+
+void sysbeepstop(void)
+{
+	/* disable counter 2 */
+	outb(inb_p(0x61)&0xFC, 0x61);
+}
+
+int beepcount = 0;
+
+/**
+ * 打开蜂鸣，设置8255A&定时器通道2
+ */
+static void sysbeep(void)
+{
+	/* enable counter 2 */
+	outb_p(inb_p(0x61)|3, 0x61);//0x61为8255A芯片PB端口，位1为扬声器开启信号，位0为定时器通道2信号
+	/* set command for counter 2, 2 byte write */
+	outb_p(0xB6, 0x43);
+	/* send 0x637 for 750 HZ */
+	outb_p(0x37, 0x42);
+	outb(0x06, 0x42);
+	/* 1/8 second */
+	beepcount = HZ/8;
+}
+
+static void ri(void)
+{
+	if (y>top) {
+		y--;
+		pos -= video_size_row;
+		return;
+	}
+	scrdown();
+}
+
+static void del(void)
+{
+	if (x) {
+		pos -= 2;
+		x--;
+		*(unsigned short *)pos = video_erase_char;
+	}
+}
+
+
 //输出到当前tty的控制台
 void con_write(struct tty_struct * tty) {
 	int nr; //缓冲队列当前字符数
@@ -431,10 +493,9 @@ void con_write(struct tty_struct * tty) {
 					pos -= video_size_row;
 					lf();
 				}
-				__asm__("movb _attr,%%ah\n\t"
+				__asm__("movb attr,%%ah\n\t"
 					"movw %%ax,%1\n\t"
-					::"a" (c),"m" (*(short *)pos)
-					:"ax");
+					::"a" (c),"m" (*(short *)pos));
 				pos += 2;
 				x++;
 			} else if (c==27)
@@ -640,30 +701,4 @@ void con_init(void) {
 	//禁用键盘
 	outb(a, 0x61);
 	//开启键盘（重置）
-}
-
-
-
-void sysbeepstop(void)
-{
-	/* disable counter 2 */
-	outb(inb_p(0x61)&0xFC, 0x61);
-}
-
-int beepcount = 0;
-
-/**
- * 打开蜂鸣，设置8255A&定时器通道2
- */
-static void sysbeep(void)
-{
-	/* enable counter 2 */
-	outb_p(inb_p(0x61)|3, 0x61);//0x61为8255A芯片PB端口，位1为扬声器开启信号，位0为定时器通道2信号
-	/* set command for counter 2, 2 byte write */
-	outb_p(0xB6, 0x43);
-	/* send 0x637 for 750 HZ */
-	outb_p(0x37, 0x42);
-	outb(0x06, 0x42);
-	/* 1/8 second */
-	beepcount = HZ/8;
 }

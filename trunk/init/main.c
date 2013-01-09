@@ -16,7 +16,6 @@ static long	buffer_memory_end=0;//高速缓冲区末端
 static long	main_memory_start=0;//主内存开始位置（用于分页）
 void main(void)
 {
-	start();
 	ROOT_DEV = ORIG_ROOT_DEV;
 	drive_info = DRIVE_INFO;
 	memory_end = (1<<20)+(EXT_MEM_K<<10); //内存大小=1M+扩展内存（K）*1024 字节

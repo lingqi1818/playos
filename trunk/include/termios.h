@@ -7,6 +7,7 @@ struct termios {
 	unsigned long c_iflag;		/* input mode flags */
 	unsigned long c_oflag;		/* output mode flags */
 	unsigned long c_lflag;		/* local mode flags */
+	unsigned char c_cc[NCCS];
 };
 
 

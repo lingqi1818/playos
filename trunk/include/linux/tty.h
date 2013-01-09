@@ -28,6 +28,15 @@ struct tty_queue {
 (void)({(queue).buf[(queue).head]=(c);INC((queue).head);})
 
 
+#define INTR_CHAR(tty) ((tty)->termios.c_cc[VINTR])
+#define QUIT_CHAR(tty) ((tty)->termios.c_cc[VQUIT])
+#define ERASE_CHAR(tty) ((tty)->termios.c_cc[VERASE])
+#define KILL_CHAR(tty) ((tty)->termios.c_cc[VKILL])
+#define EOF_CHAR(tty) ((tty)->termios.c_cc[VEOF])
+#define START_CHAR(tty) ((tty)->termios.c_cc[VSTART])
+#define STOP_CHAR(tty) ((tty)->termios.c_cc[VSTOP])
+#define SUSPEND_CHAR(tty) ((tty)->termios.c_cc[VSUSP])
+
 struct tty_struct {
 	struct termios termios;//终端IO控制数据结构
 	int pgrp;//所属进程组
@@ -39,7 +48,7 @@ struct tty_struct {
 	};
 
 extern struct tty_struct tty_table[];
-#define INIT_CC ""
+#define INIT_C_CC "\003\034\177\025\004\0\1\0\021\023\032\0\022\017\027\026\0"
 
 void con_init(void);
 void tty_init(void);

@@ -2,6 +2,7 @@
  * 进程调度实现
  */
 #include <linux/sched.h>
+#include <linux/kernel.h>
 #include <asm/system.h>
 #include <sys/types.h>
 #include <asm/io.h>
@@ -94,7 +95,7 @@ void sched_init(void) {
 
 	void task1(){
 		while(1)
-		user_write_char('v');
+		printk("v");
 	}
 
 

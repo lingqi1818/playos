@@ -31,15 +31,15 @@ void main(void)
 		main_memory_start =	buffer_memory_end;//主内存起始位置=缓冲区末端
 		//TODO 虚拟盘都问题以后再做研究
 
-		mem_init(main_memory_start,memory_end);//主内存初始化
-		trap_init();//硬件中断向量初始化
+		//mem_init(main_memory_start,memory_end);//主内存初始化
+		//trap_init();//硬件中断向量初始化
 		chr_dev_init();
 		tty_init();
 		sched_init();
-		hd_init();
+		//hd_init();
 		//TODO,其他模块初始化
-		sti();
+		//sti();
 		move_to_user_mode();//从内核态进入用户态，init进程开始
 		while(1)
-		printk("u");
+		printk("test");
 }

@@ -92,4 +92,5 @@ return -1; \
 #endif
 
 extern int errno;
+int write(int fildes, const char * buf, off_t count);
 #endif

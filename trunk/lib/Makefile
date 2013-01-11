@@ -10,7 +10,7 @@ LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../include
 CC		= gcc
 CFLAGS		= -c -g
-OBJS=	ctype.o errno.o
+OBJS=	ctype.o errno.o write.o
 
 .c.s:
 	$(CC) $(CFLAGS) \

@@ -9,7 +9,7 @@ LD	=ld
 LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../../include
 CC		= gcc
-CFLAGS		= -c -g
+CFLAGS		= -c -g -fno-zero-initialized-in-bss
 OBJS=	tty_io.o console.o keyboard.o
 
 .c.s:

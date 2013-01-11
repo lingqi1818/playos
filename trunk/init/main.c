@@ -35,6 +35,8 @@ void main(void)
 		//trap_init();//硬件中断向量初始化
 		chr_dev_init();
 		tty_init();
+		printk("haha ,i'm play os use printk :-)");
+		while(1){}
 		sched_init();
 		//hd_init();
 		//TODO,其他模块初始化

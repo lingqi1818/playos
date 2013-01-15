@@ -48,4 +48,5 @@ console.o: console.c ../../include/linux/sched.h \
 tty_io.o: tty_io.c ../../include/ctype.h ../../include/linux/tty.h \
  ../../include/termios.h ../../include/signal.h \
  ../../include/linux/sched.h ../../include/linux/head.h \
- ../../include/linux/mm.h
+ ../../include/linux/mm.h ../../include/asm/system.h \
+ ../../include/asm/segment.h

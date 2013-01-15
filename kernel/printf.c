@@ -1,6 +1,7 @@
 /**
  * 向终端输出格式化的字符串
  */
+#include <stdarg.h>
 static char printbuf[1024];
 
 int printf(const char *fmt, ...)

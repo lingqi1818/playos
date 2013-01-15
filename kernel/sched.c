@@ -58,6 +58,7 @@ struct task_struct *last_task_used_math = NULL;
 //时钟中断和系统调用，定义在system_call.s中
 extern int timer_interrupt(void);
 extern int system_call(void);
+extern void user_write_char(char);
 //调度初始化
 void sched_init(void) {
 	int i;
@@ -107,11 +108,11 @@ void sched_init(void) {
 	//设置系统调用中断门
 }
 
-void time_print() {
-	__asm__("movb $0x20,%%al\n\t"
-			"outb %%al,$0x20"::);
-	write_char('t');
-}
+//void time_print() {
+//	__asm__("movb $0x20,%%al\n\t"
+//			"outb %%al,$0x20"::);
+//	write_char('t');
+//}
 void init_task1() {
 	set_tss_desc(gdt+2+FIRST_TSS_ENTRY, &(test_task_1.task.tss));
 	set_ldt_desc(gdt+2+FIRST_LDT_ENTRY, &(test_task_1.task.ldt));
@@ -122,8 +123,10 @@ void init_task1() {
 }
 
 void task1() {
-	while (1)
-		printk("v");
+//	while (1)
+	//user_write_char('v');
+		printf("v");
+		while (1){}
 }
 
 

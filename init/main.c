@@ -14,6 +14,7 @@ struct drive_info {
 static long memory_end=0;
 static long	buffer_memory_end=0;//高速缓冲区末端
 static long	main_memory_start=0;//主内存开始位置（用于分页）
+extern void user_write_char(char);
 void main(void)
 {
 	ROOT_DEV = ORIG_ROOT_DEV;
@@ -35,13 +36,14 @@ void main(void)
 		//trap_init();//硬件中断向量初始化
 		chr_dev_init();
 		tty_init();
-		printk("haha ,i'm play os use printk :-)");
-		while(1){}
+		printk("haha ,i'm play os use printk :-)\n");
 		sched_init();
 		//hd_init();
 		//TODO,其他模块初始化
-		//sti();
+		sti();
 		move_to_user_mode();//从内核态进入用户态，init进程开始
-		while(1)
-		printk("test");
+		//user_write_char("t");
+		//while(1)
+			printf("u");
+			while(1){}
 }

@@ -7,7 +7,7 @@
 LD	=ld
 LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../include
-OBJS=	traps.o printk.o vsprintf.o sched.o system_call.o panic.o
+OBJS=	traps.o printk.o printf.o vsprintf.o sched.o system_call.o panic.o
 CC		= gcc
 ## -fno-stack-protector去掉对栈的保护，否则可能出现：undefined reference to `__stack_chk_fail'
 CFLAGS		= -c -fno-stack-protector -g
@@ -41,6 +41,7 @@ dep:
 ### Dependencies:
 panic.s panic.o: panic.c ../include/linux/kernel.h ../include/linux/sched.h \
  ../include/linux/head.h ../include/linux/mm.h ../include/signal.h
+printf.s printf.o: printf.c ../include/stdarg.h
 printk.s printk.o: printk.c ../include/stdarg.h
 sched.s sched.o: sched.c ../include/linux/sched.h ../include/linux/head.h \
  ../include/linux/mm.h ../include/signal.h ../include/linux/kernel.h \

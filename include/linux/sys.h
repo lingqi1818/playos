@@ -1,4 +1,4 @@
-/*extern int sys_setup();
+extern int sys_setup();
 extern int sys_exit();
 extern int sys_fork();
 extern int sys_read();
@@ -69,6 +69,6 @@ extern int sys_sigaction();
 extern int sys_sgetmask();
 extern int sys_ssetmask();
 extern int sys_setreuid();
-extern int sys_setregid();*/
+extern int sys_setregid();
 
-fn_ptr sys_call_table[] = {};
+fn_ptr sys_call_table[] = {0,0,0,0,sys_write};

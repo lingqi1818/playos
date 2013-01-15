@@ -7,7 +7,7 @@
 LD	=ld
 LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../include
-OBJS=	super.o
+OBJS=	super.o read_write.o
 CC		= gcc
 CFLAGS		= -c -g
 
@@ -32,4 +32,5 @@ dep:
 	cp tmp_make Makefile
 	
 ### Dependencies:
+read_write.o: read_write.c
 super.o: super.c

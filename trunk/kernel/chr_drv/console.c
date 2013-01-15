@@ -27,26 +27,26 @@
 
 extern void keyboard_interrupt(void);
 
-static unsigned char video_type; /* Type of display being used	显示类型*/
-static unsigned long video_num_columns; /* Number of text columns	文本列数*/
-static unsigned long video_size_row; /* Bytes per row		每行字节数*/
-static unsigned long video_num_lines; /* Number of test lines		文本行数*/
-static unsigned char video_page; /* Initial video page		初始显示页面*/
-static unsigned long video_mem_start; /* Start of video RAM		显存起始地址*/
-static unsigned long video_mem_end; /* End of video RAM (sort of)	显存结束地址*/
-static unsigned short video_port_reg; /* Video register select port	显示控制索引寄存器端口*/
-static unsigned short video_port_val; /* Video register value port	显示控制数据寄存器端口*/
-static unsigned short video_erase_char; /* Char+Attrib to erase with	擦出字符属性及字符*/
+ unsigned char video_type; /* Type of display being used	显示类型*/
+ unsigned long video_num_columns; /* Number of text columns	文本列数*/
+ unsigned long video_size_row; /* Bytes per row		每行字节数*/
+ unsigned long video_num_lines; /* Number of test lines		文本行数*/
+ unsigned char video_page; /* Initial video page		初始显示页面*/
+ unsigned long video_mem_start; /* Start of video RAM		显存起始地址*/
+ unsigned long video_mem_end; /* End of video RAM (sort of)	显存结束地址*/
+ unsigned short video_port_reg; /* Video register select port	显示控制索引寄存器端口*/
+ unsigned short video_port_val; /* Video register value port	显示控制数据寄存器端口*/
+ unsigned short video_erase_char; /* Char+Attrib to erase with	擦出字符属性及字符*/
 
-static unsigned long origin; /* Used for EGA/VGA fast scroll	滚屏起始内存地址（新屏起始位置）*/
-static unsigned long scr_end; /* Used for EGA/VGA fast scroll	滚屏末端内存地址*/
-static unsigned long pos; //当前光标对应显存地址
-static unsigned long x, y; //当前光标位置
-static unsigned long top, bottom; //滚动时顶行行号和底行行号
-static unsigned long state = 0; //ANSI转义字符序列处理状态
-static unsigned long npar, par[NPAR]; //ANSI转义字符序列参数个数和参数数组
-static unsigned long ques = 0; //收到问号字符标志
-static unsigned char attr = 0x07; //字符属性，黑底白字
+ unsigned long origin; /* Used for EGA/VGA fast scroll	滚屏起始内存地址（新屏起始位置）*/
+ unsigned long scr_end; /* Used for EGA/VGA fast scroll	滚屏末端内存地址*/
+ unsigned long pos; //当前光标对应显存地址
+ unsigned long x, y; //当前光标位置
+ unsigned long top, bottom; //滚动时顶行行号和底行行号
+ unsigned long state = 0; //ANSI转义字符序列处理状态
+ unsigned long npar, par[NPAR]; //ANSI转义字符序列参数个数和参数数组
+ unsigned long ques = 0; //收到问号字符标志
+ unsigned char attr = 0x07; //字符属性，黑底白字
 
 #define RESPONSE "\033[?1;2c"
 

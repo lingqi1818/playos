@@ -107,6 +107,7 @@ dep:
 	(cd lib;make dep)
 	
 ### Dependencies:
-init/main.o: init/main.c include/unistd.h include/linux/kernel.h \
- include/linux/fs.h include/asm/system.h include/linux/sched.h \
- include/linux/head.h include/linux/mm.h include/signal.h
+init/main.o: init/main.c include/unistd.h include/sys/types.h \
+ include/linux/kernel.h include/linux/fs.h include/asm/system.h \
+ include/linux/sched.h include/linux/head.h include/linux/mm.h \
+ include/signal.h

@@ -12,12 +12,10 @@
 #define PAGING_PAGES (PAGING_MEMORY>>12)//分页后物理内存页面数（3840）
 #define MAP_NR(addr) (((addr)-LOW_MEM)>>12)//指定内存地址映射为页号
 #define USED 100
-void write_char(char);
 static long HIGH_MEMORY = 0;
 static unsigned char mem_map [ PAGING_PAGES ] = {0,};
 void mem_init(long start_mem, long end_mem){
-	write_char('M');
-	write_char('M');
+
 	int i;
 	HIGH_MEMORY=end_mem;
 	for (i=0 ; i<PAGING_PAGES ; i++)

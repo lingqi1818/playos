@@ -39,3 +39,4 @@ dep:
 ### Dependencies:
 ctype.s ctype.o: ctype.c ../include/ctype.h
 errno.s errno.o: errno.c
+write.s write.o: write.c ../include/unistd.h ../include/sys/types.h

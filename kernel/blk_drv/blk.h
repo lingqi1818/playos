@@ -31,6 +31,7 @@ struct blk_dev_struct {
 
 extern struct blk_dev_struct blk_dev[NR_BLK_DEV];
 extern struct request request[NR_REQUEST];
+extern struct task_struct * wait_for_request;
 
 #ifdef MAJOR_NR
 #if (MAJOR_NR == 1)
@@ -49,6 +50,7 @@ extern struct request request[NR_REQUEST];
 #define DEVICE_NR(device) (MINOR(device)/5)
 #define DEVICE_INTR do_hd
 #define DEVICE_REQUEST do_hd_request
+#define DEVICE_OFF(device)
 
 #else
 /* unknown blk device */
@@ -63,7 +65,9 @@ extern struct request request[NR_REQUEST];
 void (*DEVICE_INTR)(void) = NULL;
 #endif
 
-extern inline void unlock_buffer(struct buffer_head * bh)
+void (DEVICE_REQUEST)(void);
+
+inline void unlock_buffer(struct buffer_head * bh)
 {
 	if (!bh->b_lock)
 		printk(DEVICE_NAME ": free buffer being unlocked\n");
@@ -71,7 +75,7 @@ extern inline void unlock_buffer(struct buffer_head * bh)
 	wake_up(&bh->b_wait);
 }
 
-extern inline void end_request(int uptodate)
+inline void end_request(int uptodate)
 {
 	DEVICE_OFF(CURRENT->dev);
 	if (CURRENT->bh) {

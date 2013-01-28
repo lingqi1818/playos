@@ -7,7 +7,7 @@
 LD	=ld
 LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../include
-OBJS=	super.o read_write.o
+OBJS=	super.o read_write.o buffer.o
 CC		= gcc
 CFLAGS		= -c -g
 
@@ -32,5 +32,8 @@ dep:
 	cp tmp_make Makefile
 	
 ### Dependencies:
-read_write.o: read_write.c
+buffer.o: buffer.c ../include/linux/fs.h ../include/sys/types.h \
+ ../include/asm/system.h ../include/asm/io.h
+open.o: open.c
+read_write.o: read_write.c ../include/linux/kernel.h
 super.o: super.c

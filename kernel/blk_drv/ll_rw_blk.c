@@ -3,6 +3,7 @@
  */
 #include "blk.h"
 #include <linux/fs.h>
+#include <asm/system.h>
 
 struct request request[NR_REQUEST];//硬盘操作请求数组
 struct task_struct * wait_for_request = NULL;//请求数组没有空闲项的等待队列
@@ -16,6 +17,23 @@ struct blk_dev_struct blk_dev[NR_BLK_DEV] = {
 	{ NULL, NULL },		/* dev tty */
 	{ NULL, NULL }		/* dev lp */
 };
+
+static inline void lock_buffer(struct buffer_head * bh)
+{
+	cli();
+	while (bh->b_lock)
+		sleep_on(&bh->b_wait);
+	bh->b_lock=1;
+	sti();
+}
+
+static inline void unlock_buffer(struct buffer_head * bh)
+{
+	if (!bh->b_lock)
+		printk("ll_rw_block.c: buffer not locked\n\r");
+	bh->b_lock = 0;
+	wake_up(&bh->b_wait);
+}
 
 //添加请求到队列
 static void add_request(struct blk_dev_struct * dev, struct request * req)

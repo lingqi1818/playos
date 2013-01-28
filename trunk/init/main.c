@@ -39,6 +39,7 @@ void main(void)
 		tty_init();
 		printk("haha ,i'm play os use printk :-)\n");
 		sched_init();
+		buffer_init(buffer_memory_end);
 		hd_init();
 		//TODO,其他模块初始化
 		sti();

@@ -19,9 +19,25 @@ inb_p(0x71); \
 #define MAX_HD		2
 
 static void recal_intr(void);
+extern void hd_interrupt(void);
 
 static int recalibrate = 1;
 static int reset = 1;
+
+/**
+ * 读取温盘请求结果状态
+ */
+static int win_result(void)
+{
+	int i=inb_p(HD_STATUS);
+
+	if ((i & (BUSY_STAT | READY_STAT | WRERR_STAT | SEEK_STAT | ERR_STAT))
+		== (READY_STAT | SEEK_STAT))
+		return(0); /* ok */
+	if (i&1) i=inb(HD_ERROR);
+	return (1);
+}
+
 /**
  * 硬盘在BIOS中的信息
  */
@@ -55,6 +71,70 @@ void unexpected_hd_interrupt(void)
 	printk("Unexpected HD interrupt\n\r");
 }
 
+static int controller_ready(void)
+{
+	int retries=10000;
+
+	while (--retries && (inb_p(HD_STATUS)&0xc0)!=0x40);
+	return (retries);
+}
+
+static void hd_out(unsigned int drive,unsigned int nsect,unsigned int sect,
+		unsigned int head,unsigned int cyl,unsigned int cmd,
+		void (*intr_addr)(void))
+{
+	register int port asm("dx");
+
+	if (drive>1 || head>15)
+		panic("Trying to write bad sector");
+	if (!controller_ready())
+		panic("HD controller not ready");
+	do_hd = intr_addr;
+	outb_p(hd_info[drive].ctl,HD_CMD);
+	port=HD_DATA;
+	outb_p(hd_info[drive].wpcom>>2,++port);
+	outb_p(nsect,++port);
+	outb_p(sect,++port);
+	outb_p(cyl,++port);
+	outb_p(cyl>>8,++port);
+	outb_p(0xA0|(drive<<4)|head,++port);
+	outb(cmd,++port);
+}
+
+static int drive_busy(void)
+{
+	unsigned int i;
+
+	for (i = 0; i < 10000; i++)
+		if (READY_STAT == (inb_p(HD_STATUS) & (BUSY_STAT|READY_STAT)))
+			break;
+	i = inb(HD_STATUS);
+	i &= BUSY_STAT | READY_STAT | SEEK_STAT;
+	if (i == READY_STAT | SEEK_STAT)
+		return(0);
+	printk("HD controller times out\n\r");
+	return(1);
+}
+
+static void reset_controller(void)
+{
+	int	i;
+
+	outb(4,HD_CMD);
+	for(i = 0; i < 100; i++) nop();
+	outb(hd_info[0].ctl & 0x0f ,HD_CMD);
+	if (drive_busy())
+		printk("HD-controller still busy\n\r");
+	if ((i = inb(HD_ERROR)) != 1)
+		printk("HD-controller reset failed: %02x\n\r",i);
+}
+
+static void reset_hd(int nr)
+{
+	reset_controller();
+	hd_out(nr,hd_info[nr].sect,hd_info[nr].sect,hd_info[nr].head-1,
+		hd_info[nr].cyl,WIN_SPECIFY,&recal_intr);
+}
 
 int sys_setup(void * BIOS){
 	static int callable = 1;
@@ -122,6 +202,13 @@ int sys_setup(void * BIOS){
 		//TODO 文件系统初始化
 }
 
+static void bad_rw_intr(void)
+{
+	if (++CURRENT->errors >= MAX_ERRORS)//如果请求出错大于MAX,则结束请求
+		end_request(0);
+	if (CURRENT->errors > MAX_ERRORS/2)//如果已经出错了3次，则先重置磁盘
+		reset = 1;
+}
 
 static void read_intr(void)
 {

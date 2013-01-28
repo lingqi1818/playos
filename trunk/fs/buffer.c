@@ -3,6 +3,8 @@
  */
 #include <linux/fs.h>
 #include <sys/types.h>
+#include <asm/system.h>
+#include <asm/io.h>
 extern int end;//内核的结尾标记，由LD程序产生
 struct buffer_head * start_buffer = (struct buffer_head *) &end;
 static struct buffer_head * free_list;
@@ -10,6 +12,17 @@ struct buffer_head * hash_table[NR_HASH];
 static struct task_struct * buffer_wait = NULL;
 int NR_BUFFERS = 0;
 
+#define _hashfn(dev,block) (((unsigned)(dev^block))%NR_HASH)
+#define hash(dev,block) hash_table[_hashfn(dev,block)]
+
+
+static inline void wait_on_buffer(struct buffer_head * bh)
+{
+	cli();
+	while (bh->b_lock)
+		sleep_on(&bh->b_wait);
+	sti();
+}
 
 static inline void remove_from_queues(struct buffer_head * bh)
 {

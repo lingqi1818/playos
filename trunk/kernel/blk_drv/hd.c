@@ -14,8 +14,7 @@ outb_p(0x80|addr,0x70); \
 inb_p(0x71); \
 })
 
-/* Max read/write errors/sector */
-#define MAX_ERRORS	7
+#define MAX_ERRORS	7 //每个扇区最大读写失败数
 #define MAX_HD		2
 
 static void recal_intr(void);
@@ -71,6 +70,10 @@ void unexpected_hd_interrupt(void)
 	printk("Unexpected HD interrupt\n\r");
 }
 
+/*
+ * 循环判断磁盘控制器就绪
+ * inb_p(HD_STATUS)返回结果位7为控制器忙位，位6为磁盘就绪
+ */
 static int controller_ready(void)
 {
 	int retries=10000;

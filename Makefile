@@ -4,23 +4,22 @@
 # mail:lingqi1818@gmail.com        # 
 ####################################
 
-ASM		= as86
-ASM_LD		= ld86 -0
+AS86	=as86 -0 -a
+LD86	=ld86 -0
 AS		= as
 LD		= ld
 ##LD_FLAGS	=-s -x
-LD_FLAGS	=-x
-ASMFLAGS	= -0 -a -o
+LDFLAGS	=-m elf_i386 -Ttext 0 -e startup_32
 ##LD86_FLAGS	= -0 -s -o
 LD86_FLAGS	= -0 -o
-CC		= gcc
-CFLAGS		= -c -g
+CC	=gcc -march=i386 $(RAMDISK)
+CFLAGS	=-c -g
 
 ARCHIVES=fs/fs.o mm/mm.o lib/string.o kernel/kernel.o
 DRIVERS =kernel/blk_drv/blk_drv.a kernel/chr_drv/chr_drv.a
 LIBS	=lib/lib.a
-PLAYOS_SECTS	= boot/bootsect.bin boot/setup.bin tools/system
-OBJS 		= boot/bootsect.o boot/setup.o boot/head.o init/main.o
+PLAYOS_SECTS	= boot/bootsect boot/setup tools/system
+OBJS 		= boot/head.o init/main.o
 CPP	=cpp -nostdinc -Iinclude
 # 避免当目标文件存在都时候，goal不执行
 .PHONY : all clean
@@ -29,8 +28,7 @@ CPP	=cpp -nostdinc -Iinclude
 	$(CC) $(CFLAGS) \
 	-nostdinc -Iinclude -S -o $*.s $<
 .s.o:
-	$(AS) -o  $*.o $<
-
+	$(AS)  -o $*.o $<
 .c.o:
 	$(CC) $(CFLAGS) \
 	-nostdinc -fno-builtin -Iinclude -O -o $*.o $<
@@ -41,34 +39,27 @@ default:
 all: ${OBJS} ${PLAYOS_SECTS} 
 
 clean :
-	rm -rf ${OBJS} ${PLAYOS_SECTS} ${ARCHIVES} boot.img System.map ## 加上@符号就不会打印执行都命令本身
+	rm -rf ${OBJS} ${PLAYOS_SECTS} ${ARCHIVES} boot.img tools/build System.map ## 加上@符号就不会打印执行都命令本身
 	(cd fs; make clean)
 	(cd mm; make clean)
 	(cd kernel; make clean)
 	(cd lib;make clean)
 ## bootsect程序
-boot/bootsect.o : boot/bootsect.s
-	${ASM} ${ASMFLAGS} $@ $<  ## $<代表依赖都目标，这里为:boot/bootsect.o,$@代表目标，这里为:bootsect.o
-
-boot/bootsect.bin:
-	${ASM_LD} ${LD86_FLAGS} $@ boot/bootsect.o
-
+boot/bootsect:	boot/bootsect.s
+	$(AS86) -o boot/bootsect.o boot/bootsect.s
+	$(LD86) -s -o boot/bootsect boot/bootsect.o
 ## setup程序
-boot/setup.o : boot/setup.s
-	${ASM} ${ASMFLAGS} $@ $<  ## $<代表依赖都目标，这里为:boot/setup.o,$@代表目标，这里为:setup.o
-
-boot/setup.bin:
-	${ASM_LD} ${LD86_FLAGS} $@ boot/setup.o
-
-## head程序
-boot/head.o : boot/head.s
+boot/setup: boot/setup.s
+	$(AS86) -o boot/setup.o boot/setup.s
+	$(LD86) -s -o boot/setup boot/setup.o
 
 tools/system:	boot/head.o init/main.o $(ARCHIVES) $(DRIVERS) $(LIBS)
-	$(LD) $(LDFLAGS) -m elf_i386 -Ttext 0 -e startup_32  boot/head.o init/main.o \
+	$(LD) $(LDFLAGS)  boot/head.o init/main.o \
 	$(ARCHIVES) \
 	$(DRIVERS) \
 	$(LIBS) \
 	-o tools/system
+	nm tools/system | grep -v '\(compiled\)\|\(\.o$$\)\|\( [aU] \)\|\(\.\.ng$$\)\|\(LASH[RL]DI\)'| sort > System.map 
 	
 kernel/chr_drv/chr_drv.a:
 	(cd kernel/chr_drv; make)
@@ -88,12 +79,20 @@ mm/mm.o:
 kernel/kernel.o:
 	(cd kernel; make)
 	
+tools/build: tools/build.c
+	gcc -mcpu=i386 $(RAMDISK) -Wall -O2 -fomit-frame-pointer  \
+	-o tools/build tools/build.c	
+	
+Image: boot/bootsect boot/setup tools/system tools/build
+	objcopy -O binary -R .note -R .comment tools/system tools/kernel
+	tools/build boot/bootsect boot/setup tools/kernel $(ROOT_DEV) > Image
+	rm tools/kernel -f
+	sync
+	
 image: clean all buildimg
 
-buildimg:
-	dd bs=32 if=boot/bootsect.bin of=boot.img skip=1 ##dd命令，将指定文件写出磁盘 skip=1跳过头1个block，因为该32字节为ld86为minix专用
-	dd bs=32 if=boot/setup.bin of=boot.img skip=1 seek=16 ##从文件都第513个字节开始写
-	dd bs=512 if=tools/system of=boot.img skip=8 seek=5 ##前5个扇区为bootsect和setup
+buildimg:Image
+	dd bs=8192 if=Image of=boot.img
 	sync
 	
 

@@ -71,4 +71,4 @@ extern int sys_ssetmask();
 extern int sys_setreuid();
 extern int sys_setregid();
 
-fn_ptr sys_call_table[] = {0,0,0,0,sys_write};
+fn_ptr sys_call_table[] = {sys_setup,0,0,0,sys_write};

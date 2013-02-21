@@ -157,6 +157,8 @@ int sys_setup(void * BIOS){
 			hd_info[drive].ctl = *(unsigned char *) (8+BIOS);
 			hd_info[drive].lzone = *(unsigned short *) (12+BIOS);
 			hd_info[drive].sect = *(unsigned char *) (14+BIOS);
+			printk("hd.sect -> %d",*(unsigned char *) (14+BIOS));
+						while(1);
 			BIOS += 16;
 		}
 		if (hd_info[1].cyl)

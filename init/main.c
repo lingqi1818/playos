@@ -4,9 +4,10 @@
 #include <linux/fs.h>
 #include <asm/system.h>
 #include <linux/sched.h>
+static inline _syscall1(int,setup,void *,BIOS)
 #define EXT_MEM_K (*(unsigned short *)0x90002)	//扩展内存大小
 #define ORIG_ROOT_DEV (*(unsigned short *)0x901FC)//ROOT_DEV设备号，在bootsect中定义（508字节处），由于bootsect被加载到0x90000~~0x901ff处，所以ROOT_DEV地址为0x901FC。
-#define DRIVE_INFO (*(struct drive_info *)0x90080)	//第一个硬盘信息
+#define DRIVE_INFO (*(struct drive_info *)0x90080)	//硬盘信息
 struct drive_info {
 	char dummy[32];
 } drive_info;//硬盘参数表
@@ -14,7 +15,6 @@ struct drive_info {
 static long memory_end=0;
 static long	buffer_memory_end=0;//高速缓冲区末端
 static long	main_memory_start=0;//主内存开始位置（用于分页）
-extern void user_write_char(char);
 void main(void)
 {
 	ROOT_DEV = ORIG_ROOT_DEV;
@@ -37,6 +37,10 @@ void main(void)
 		blk_dev_init();
 		chr_dev_init();
 		tty_init();
+		void *pp = drive_info.dummy;
+
+		printk("d1-> %d\n",*(unsigned short *) pp);
+		printk("d2-> %d\n",*(unsigned char *) (14+pp));
 		printk("haha ,i'm play os use printk :-)\n");
 		sched_init();
 		buffer_init(buffer_memory_end);
@@ -46,6 +50,7 @@ void main(void)
 		move_to_user_mode();//从内核态进入用户态，init进程开始
 		//user_write_char("t");
 		//while(1)
+			setup((void *) &drive_info);
 			printf("u");
 			while(1){}
 }

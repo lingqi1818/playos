@@ -28,7 +28,7 @@ start:
 	! CL＝光标的终止行
 	! DH＝行(Y坐标)
 	! DL＝列(X坐标)
-	mov	ah,#0x03	
+	mov	ah,#0x03
 	xor	bh,bh
 	int	0x10
 	mov	[0],dx	! 保存光标位置
@@ -40,7 +40,7 @@ start:
 	mov	ah,#0x88
 	int	0x15
 	mov	[2],ax
-	
+
 	! int 0x10 功能0FH
 	! 功能描述：读取显示器模式
 	! 入口参数：AH＝0FH
@@ -62,7 +62,7 @@ start:
 
 	! 获取硬盘信息，第一个硬盘参数表首地址为中断向量0x41的向量值（中断向量表中的每一项为向量号*4，每项占用4个字节）
 	! 硬盘信息表都长度为16个字节
-	mov	ax,0x0000
+	mov	ax,#0x0000
 	mov	ds,ax
 	lds	si,[4*0x41]
 	mov	ax,#INITSEG
@@ -71,7 +71,7 @@ start:
 	mov	cx,#0x10
 	rep
 	movsb
-	
+
 	! 获取第二个磁盘信息
 	mov	ax,0x0000
 	mov	ds,ax
@@ -143,7 +143,7 @@ end_move:
 	.word	0x00eb,0x00eb	! 每个0x00eb耗费CPU7-10个时钟周期延迟，如果用nop指令则耗费3个
 	out	#0xa0,al
 	.word	0x00eb,0x00eb
-	
+
 	! icw2
 	mov	al,#0x20	! 主芯片，中断号从0x20开始
 	out	#0x21,al
@@ -159,7 +159,7 @@ end_move:
 	mov	al,#0x02	! 主片的IR号
 	out	#0xa1,al
 	.word	0x00eb,0x00eb
-	
+
 	! icw4
 	mov	al,#0x01	! 80x86模式,普通EOI，非缓冲方式
 	out	#0x21,al
@@ -171,7 +171,7 @@ end_move:
 	out	#0x21,al	! 屏蔽主芯片所有中断,打开时钟中断
 	.word	0x00eb,0x00eb	! 屏蔽从芯片所有中断
 	out	#0xa1,al
-	
+
 	mov	ax,#0x0001
 	lmsw	ax
 	jmpi	0,8
@@ -183,7 +183,7 @@ empty_8042:
 	test	al,#2
 	jnz	empty_8042	! 不为空，进入死循环
 	ret
-	
+
 gdt:
 	.word	0,0,0,0
 	.word	0x07ff	! 段界限为2048*4K=8M

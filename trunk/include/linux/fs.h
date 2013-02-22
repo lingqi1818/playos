@@ -8,7 +8,7 @@
 //主设备号：1-内存，2-磁盘，3-硬盘，4-ttyx,5-tty,6-并行口，7-非命名管道
 #ifndef _FS_H
 #define _FS_H
-
+#include <sys/types.h>
 #define READ 0
 #define WRITE 1
 #define READA 2		/* read-ahead - don't pause */
@@ -111,4 +111,7 @@ struct m_inode {
 	unsigned char i_seek;//搜寻标识（lseek时）
 	unsigned char i_update;//更新标识
 };
+
+
+extern struct file file_table[NR_FILE];
 #endif

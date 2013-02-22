@@ -12,6 +12,6 @@ void mount_root(void)
 			file_table[i].f_count=0;
 		if (MAJOR(ROOT_DEV) == 2) {
 			printk("Insert root floppy and press ENTER");
-			wait_for_keypress();
+			//wait_for_keypress();
 		}
 }

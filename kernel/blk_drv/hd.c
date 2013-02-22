@@ -157,8 +157,6 @@ int sys_setup(void * BIOS){
 			hd_info[drive].ctl = *(unsigned char *) (8+BIOS);
 			hd_info[drive].lzone = *(unsigned short *) (12+BIOS);
 			hd_info[drive].sect = *(unsigned char *) (14+BIOS);
-			printk("hd.sect -> %d",*(unsigned char *) (14+BIOS));
-						while(1);
 			BIOS += 16;
 		}
 		if (hd_info[1].cyl)
@@ -185,6 +183,8 @@ int sys_setup(void * BIOS){
 			hd[i*5].nr_sects = 0;
 		}
 
+		printk("hd0.start_sect->%d\n",hd[0].start_sect);
+		printk("hd0.nr_sects->%d\n",hd[0].nr_sects);
 		for (drive=0 ; drive<NR_HD ; drive++) {
 				if (!(bh = bread(0x300 + drive*5,0))) {
 					printk("Unable to read partition table of drive %d\n\r",
@@ -203,6 +203,14 @@ int sys_setup(void * BIOS){
 				}
 				brelse(bh);//用完之后释放缓冲区
 			}
+		printk("hd0[1].start_sect->%d\n",hd[1].start_sect);
+		printk("hd0[1].nr_sects->%d\n",hd[1].nr_sects);
+		printk("hd0[2].start_sect->%d\n",hd[2].start_sect);
+		printk("hd0[2].nr_sects->%d\n",hd[2].nr_sects);
+		printk("hd0[3].start_sect->%d\n",hd[3].start_sect);
+		printk("hd0[3].nr_sects->%d\n",hd[3].nr_sects);
+		if (NR_HD)
+			printk("Partition table%s ok.\n\r",(NR_HD>1)?"s":"");
 		//TODO 虚拟盘
 		//TODO 文件系统初始化
 }

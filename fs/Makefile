@@ -34,6 +34,7 @@ dep:
 ### Dependencies:
 buffer.o: buffer.c ../include/linux/fs.h ../include/sys/types.h \
  ../include/asm/system.h ../include/asm/io.h
+file_table.o: file_table.c ../include/linux/fs.h ../include/sys/types.h
 open.o: open.c
 read_write.o: read_write.c ../include/linux/kernel.h
-super.o: super.c
+super.o: super.c ../include/linux/fs.h ../include/sys/types.h

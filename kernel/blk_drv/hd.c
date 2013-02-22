@@ -212,7 +212,8 @@ int sys_setup(void * BIOS){
 		if (NR_HD)
 			printk("Partition table%s ok.\n\r",(NR_HD>1)?"s":"");
 		//TODO 虚拟盘
-		//TODO 文件系统初始化
+		mount_root();
+		return (0);
 }
 
 static void bad_rw_intr(void)

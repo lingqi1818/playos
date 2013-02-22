@@ -7,7 +7,7 @@
 LD	=ld
 LD_FLAGS	=-x -r
 CPP	=gcc -E -nostdinc -I../include
-OBJS=	super.o read_write.o buffer.o
+OBJS=	super.o read_write.o buffer.o file_table.o
 CC		= gcc
 CFLAGS		= -c -g
 

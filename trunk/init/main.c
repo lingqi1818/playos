@@ -37,10 +37,6 @@ void main(void)
 		blk_dev_init();
 		chr_dev_init();
 		tty_init();
-		void *pp = drive_info.dummy;
-
-		printk("d1-> %d\n",*(unsigned short *) pp);
-		printk("d2-> %d\n",*(unsigned char *) (14+pp));
 		printk("haha ,i'm play os use printk :-)\n");
 		sched_init();
 		buffer_init(buffer_memory_end);

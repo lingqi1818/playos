@@ -130,4 +130,5 @@ struct m_inode {
 
 
 extern struct file file_table[NR_FILE];
+extern struct super_block super_block[NR_SUPER];
 #endif

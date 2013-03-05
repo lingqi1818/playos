@@ -40,12 +40,13 @@ dep:
 
 ### Dependencies:
 panic.s panic.o: panic.c ../include/linux/kernel.h ../include/linux/sched.h \
- ../include/linux/head.h ../include/linux/mm.h ../include/signal.h
+ ../include/linux/fs.h ../include/sys/types.h ../include/linux/head.h \
+ ../include/linux/mm.h ../include/signal.h
 printf.s printf.o: printf.c ../include/stdarg.h
 printk.s printk.o: printk.c ../include/stdarg.h
-sched.s sched.o: sched.c ../include/linux/sched.h ../include/linux/head.h \
- ../include/linux/mm.h ../include/signal.h ../include/linux/kernel.h \
- ../include/asm/system.h ../include/sys/types.h ../include/asm/io.h \
- ../include/linux/sys.h
+sched.s sched.o: sched.c ../include/linux/sched.h ../include/linux/fs.h \
+ ../include/sys/types.h ../include/linux/head.h ../include/linux/mm.h \
+ ../include/signal.h ../include/linux/kernel.h ../include/asm/system.h \
+ ../include/asm/io.h ../include/linux/sys.h
 traps.s traps.o: traps.c ../include/asm/system.h
 vsprintf.s vsprintf.o: vsprintf.c ../include/stdarg.h ../include/string.h

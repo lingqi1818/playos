@@ -16,13 +16,29 @@
 
 #define MAJOR(a) (((unsigned)(a))>>8)
 #define MINOR(a) ((a)&0xff) 
+
+#define NAME_LEN 14
+#define ROOT_INO 1
+
 extern int ROOT_DEV;
 
 #define NR_HASH 307
 #define NR_FILE 64
+#define NR_OPEN 20
+#define NR_INODE 32
+#define NR_SUPER 8
+
 
 #define NR_BUFFERS nr_buffers
 #define BLOCK_SIZE 1024
+
+#define INODES_PER_BLOCK ((BLOCK_SIZE)/(sizeof (struct d_inode)))
+#define DIR_ENTRIES_PER_BLOCK ((BLOCK_SIZE)/(sizeof (struct dir_entry)))
+
+struct dir_entry {
+	unsigned short inode;
+	char name[NAME_LEN];
+};
 
 /**
  * 缓冲区块数据结构

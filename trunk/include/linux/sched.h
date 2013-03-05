@@ -7,6 +7,7 @@
 #ifndef _SCHED_H
 #define _SCHED_H
 
+#include <linux/fs.h>
 #include <linux/head.h>
 #include <linux/mm.h>
 #include <signal.h>
@@ -18,6 +19,11 @@
 #define TASK_STOPPED		4
 #define NR_TASKS 64 //默认任务数
 #define HZ 100
+
+extern long volatile jiffies;
+extern long startup_time;
+
+#define CURRENT_TIME (startup_time+jiffies/HZ)
 
 #define FIRST_TASK task[0]
 #define LAST_TASK task[NR_TASKS-1]
@@ -89,6 +95,13 @@ struct task_struct {
 	long blocked;	/* bitmap of masked signals */
 	long alarm;
 	long utime,stime,cutime,cstime,start_time;
+	int tty;		/* -1 if no tty, so it must be signed */
+	unsigned short umask;//创建文件属性屏蔽位
+	struct m_inode * pwd;//当前工作目录
+	struct m_inode * root;//根目录
+	struct m_inode * executable;//执行文件i节点结构
+	unsigned long close_on_exec;//执行时关闭文件句柄位图标志
+	struct file * filp[NR_OPEN];//进程使用的文件结构表
 	/* ldt for this task 0 - zero 1 - cs 2 - ds&ss */
 	struct desc_struct ldt[4];
 	/* tss for this task */
@@ -102,6 +115,8 @@ struct task_struct {
 			0,{{},}, \
 			0, \
 			0,0,0,0,0,0, \
+			-1,0022,NULL,NULL,NULL,0, \
+/* filp */	{NULL,}, \
 			{ \
 			{0,0}, \
 /* ldt */	{0x9f,0xc0fa00}, \
@@ -128,6 +143,8 @@ long task1_stack [ PAGE_SIZE>>2 ] ;
 			0,{{},}, \
 			0, \
 			0,0,0,0,0,0, \
+			-1,0022,NULL,NULL,NULL,0, \
+/* filp */	{NULL,}, \
 			{ \
 			{0,0}, \
 /* ldt */	{0x9f,0xc0fa00}, \

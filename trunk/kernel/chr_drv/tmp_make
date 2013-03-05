@@ -41,12 +41,14 @@ dep:
 	cp tmp_make Makefile
 	
 ### Dependencies:
-console.o: console.c ../../include/linux/sched.h \
- ../../include/linux/head.h ../../include/linux/mm.h \
- ../../include/signal.h ../../include/linux/tty.h ../../include/termios.h \
- ../../include/asm/io.h ../../include/asm/system.h
+console.o: console.c ../../include/linux/sched.h ../../include/linux/fs.h \
+ ../../include/sys/types.h ../../include/linux/head.h \
+ ../../include/linux/mm.h ../../include/signal.h \
+ ../../include/linux/tty.h ../../include/termios.h ../../include/asm/io.h \
+ ../../include/asm/system.h
 tty_io.o: tty_io.c ../../include/ctype.h ../../include/linux/tty.h \
  ../../include/termios.h ../../include/signal.h \
- ../../include/linux/sched.h ../../include/linux/head.h \
+ ../../include/linux/sched.h ../../include/linux/fs.h \
+ ../../include/sys/types.h ../../include/linux/head.h \
  ../../include/linux/mm.h ../../include/asm/system.h \
  ../../include/asm/segment.h

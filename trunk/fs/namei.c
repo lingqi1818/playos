@@ -2,6 +2,7 @@
  *根据name查找文件，目录等函数
  */
 #include <linux/fs.h>
+#include <linux/sched.h>
 /**
  * 在用户段fs比较name
  */

@@ -2,7 +2,9 @@
  * 主要处理逻辑块位图和inode位图
  */
 
-
+#include <string.h>
+#include <linux/sched.h>
+#include <linux/kernel.h>
 /**
  * 将指定地址除的一块1024字节的空间清零
  */
@@ -10,7 +12,7 @@
 __asm__("cld\n\t" \
 	"rep\n\t" \
 	"stosl" \
-	::"a" (0),"c" (BLOCK_SIZE/4),"D" ((long) (addr)):"cx","di")
+	::"a" (0),"c" (BLOCK_SIZE/4),"D" ((long) (addr)))
 
 
 /**
@@ -114,4 +116,35 @@ void free_block(int dev, int block)
 		panic("free_block: bit already cleared");
 	}
 	sb->s_zmap[block/8192]->b_dirt = 1;
+}
+
+
+
+void free_inode(struct m_inode * inode)
+{
+	struct super_block * sb;
+	struct buffer_head * bh;
+
+	if (!inode)
+		return;
+	if (!inode->i_dev) {
+		memset(inode,0,sizeof(*inode));
+		return;
+	}
+	if (inode->i_count>1) {
+		printk("trying to free inode with count=%d\n",inode->i_count);
+		panic("free_inode");
+	}
+	if (inode->i_nlinks)
+		panic("trying to free inode with links");
+	if (!(sb = get_super(inode->i_dev)))
+		panic("trying to free inode on nonexistent device");
+	if (inode->i_num < 1 || inode->i_num > sb->s_ninodes)
+		panic("trying to free inode 0 or nonexistant inode");
+	if (!(bh=sb->s_imap[inode->i_num>>13]))
+		panic("nonexistent imap in superblock");
+	if (clear_bit(inode->i_num&8191,bh->b_data))
+		printk("free_inode: bit already cleared.\n\r");
+	bh->b_dirt = 1;
+	memset(inode,0,sizeof(*inode));
 }

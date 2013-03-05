@@ -13,3 +13,13 @@ __asm__("cld\n\t"
 	:"=c" (__res):"D" (s),"a" (0),"0" (0xffffffff));
 return __res;
 }
+
+
+extern inline void * memset(void * s,char c,int count)
+{
+__asm__("cld\n\t"
+	"rep\n\t"
+	"stosb"
+	::"a" (c),"D" (s),"c" (count));
+return s;
+}

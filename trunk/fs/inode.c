@@ -1,6 +1,7 @@
 #include <linux/sched.h>
 #include <asm/system.h>
 #include <sys/stat.h>
+#include <string.h>
 struct m_inode inode_table[NR_INODE]={{0,},};
 
 static void read_inode(struct m_inode * inode);
@@ -41,6 +42,41 @@ void sync_inodes(void)
 		if (inode->i_dirt && !inode->i_pipe)
 			write_inode(inode);
 	}
+}
+
+
+struct m_inode * get_empty_inode(void)
+{
+	struct m_inode * inode;
+	static struct m_inode * last_inode = inode_table;
+	int i;
+
+	do {
+		inode = NULL;
+		for (i = NR_INODE; i ; i--) {
+			if (++last_inode >= inode_table + NR_INODE)
+				last_inode = inode_table;
+			if (!last_inode->i_count) {
+				inode = last_inode;
+				if (!inode->i_dirt && !inode->i_lock)
+					break;
+			}
+		}
+		if (!inode) {
+			for (i=0 ; i<NR_INODE ; i++)
+				printk("%04x: %6d\t",inode_table[i].i_dev,
+					inode_table[i].i_num);
+			panic("No free inodes in mem");
+		}
+		wait_on_inode(inode);
+		while (inode->i_dirt) {
+			write_inode(inode);
+			wait_on_inode(inode);
+		}
+	} while (inode->i_count);
+	memset(inode,0,sizeof(*inode));
+	inode->i_count = 1;
+	return inode;
 }
 
 /**

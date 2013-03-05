@@ -1,5 +1,5 @@
 #include<linux/sched.h>
-
+#include<sys/stat.h>
 /**
  * 释放一次间接块
  */

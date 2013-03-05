@@ -1,4 +1,5 @@
 #include <linux/fs.h>
+struct super_block super_block[NR_SUPER];
 int ROOT_DEV = 0;
 void mount_root(void)
 {

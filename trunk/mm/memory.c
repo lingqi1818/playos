@@ -28,3 +28,8 @@ void mem_init(long start_mem, long end_mem){
 	}
 
 }
+
+
+void free_page(unsigned long addr)
+{
+}

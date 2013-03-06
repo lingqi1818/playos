@@ -97,7 +97,26 @@ L6:
 
 
 setup_paging:
-	ret
+	movl $1024*5,%ecx		/* 5 pages - pg_dir+4 page tables */
+	xorl %eax,%eax
+	xorl %edi,%edi			/* pg_dir is at 0x000 */
+	cld;rep;stosl
+	movl $pg0+7,_pg_dir		/* set present bit/user r/w */
+	movl $pg1+7,_pg_dir+4		/*  --------- " " --------- */
+	movl $pg2+7,_pg_dir+8		/*  --------- " " --------- */
+	movl $pg3+7,_pg_dir+12		/*  --------- " " --------- */
+	movl $pg3+4092,%edi
+	movl $0xfff007,%eax		/*  16Mb - 4096 + 7 (r/w user,p) 最后一页的物理地址应该是从16M-4096开始 */
+	std
+1:	stosl			/* fill pages backwards - more efficient :-) */
+	subl $0x1000,%eax
+	jge 1b
+	xorl %eax,%eax		/* pg_dir is at 0x0000 */
+	movl %eax,%cr3		/* cr3 - page directory start */
+	movl %cr0,%eax
+	orl $0x80000000,%eax
+	movl %eax,%cr0		/* set paging (PG) bit */
+	ret			/* this also flushes prefetch-queue */
 
 idt_descr:
 	.word	256*8-1

@@ -240,3 +240,9 @@ void do_tty_interrupt(int tty)
 void chr_dev_init(void)
 {
 }
+
+
+void wait_for_keypress(void)
+{
+	sleep_if_empty(&tty_table[0].secondary);
+}

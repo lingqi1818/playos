@@ -42,6 +42,7 @@ union task_union {
 //每个任务都定义了4K的栈空间
 
 long volatile jiffies = 0;
+long startup_time=0;
 
 static union task_union init_task = { INIT_TASK, };
 static union task_union test_task_1 = { TEST_TASK_1, };

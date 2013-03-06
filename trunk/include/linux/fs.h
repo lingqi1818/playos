@@ -27,6 +27,10 @@ extern int ROOT_DEV;
 #define NR_OPEN 20
 #define NR_INODE 32
 #define NR_SUPER 8
+#define I_MAP_SLOTS 8
+#define Z_MAP_SLOTS 8
+
+#define SUPER_MAGIC 0x137F
 
 
 #define NR_BUFFERS nr_buffers
@@ -68,7 +72,7 @@ struct file {
 };
 
 /**
- * 磁盘超级块
+ * 内存中的超级块
  */
 struct super_block {
 	unsigned short s_ninodes;//节点数
@@ -90,6 +94,20 @@ struct super_block {
 	unsigned char s_lock;//锁定标志
 	unsigned char s_rd_only;//只读标志
 	unsigned char s_dirt;//已修改（脏）标志
+};
+
+/**
+ * 磁盘中的超级块
+ */
+struct d_super_block {
+	unsigned short s_ninodes;
+	unsigned short s_nzones;
+	unsigned short s_imap_blocks;
+	unsigned short s_zmap_blocks;
+	unsigned short s_firstdatazone;
+	unsigned short s_log_zone_size;
+	unsigned long s_max_size;
+	unsigned short s_magic;
 };
 
 /**
